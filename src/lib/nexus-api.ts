@@ -22,7 +22,10 @@ export interface NexusDecision {
   }>;
 }
 
-const DEFAULT_API_URL = import.meta.env.PROD\n  ? "https://nexus-executable-evidence-api.onrender.com"\n  : "http://localhost:8000";\nconst API_URL = import.meta.env.VITE_NEXUS_API_URL ?? DEFAULT_API_URL;
+const DEFAULT_API_URL = import.meta.env.PROD
+  ? "https://nexus-executable-evidence-api.onrender.com"
+  : "http://localhost:8000";
+const API_URL = import.meta.env.VITE_NEXUS_API_URL ?? DEFAULT_API_URL;
 const EXECUTION_MODE = import.meta.env.VITE_NEXUS_EXECUTION_MODE ?? "DEMO";
 
 export async function analyzeDocumentCase(
