@@ -1,0 +1,45 @@
+name: NEXUS API CI
+
+on:
+  pull_request:
+    paths:
+      - "api/**"
+      - "knowledge/**"
+      - "tests/**"
+      - "requirements.txt"
+      - "Dockerfile.api"
+      - "render.yaml"
+      - ".github/workflows/api-ci.yml"
+  push:
+    branches: [main]
+    paths:
+      - "api/**"
+      - "knowledge/**"
+      - "tests/**"
+      - "requirements.txt"
+      - "Dockerfile.api"
+      - "render.yaml"
+      - ".github/workflows/api-ci.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: python -m pip install --requirement requirements.txt
+      - run: python -m pytest -q
+
+  container:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build --file Dockerfile.api --tag nexus-api:ci .

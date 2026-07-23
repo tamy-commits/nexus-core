@@ -1,3 +1,4 @@
+import os
 from datetime import date
 from pathlib import Path
 
@@ -12,8 +13,25 @@ ROOT = Path(__file__).resolve().parents[1]
 orchestrator = NexusOrchestrator(ROOT / "knowledge")
 banking_gateway = MockBankingGateway()
 
+DEFAULT_ORIGINS = (
+    "http://localhost:3000,"
+    "http://localhost:5173,"
+    "https://nexus-blueprint-core.lovable.app"
+)
+allowed_origins = [
+    origin.strip()
+    for origin in os.getenv("ALLOWED_ORIGINS", DEFAULT_ORIGINS).split(",")
+    if origin.strip()
+]
+
 app = FastAPI(title="NEXUS Executable Evidence API", version="0.1.0")
-app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:3000", "http://localhost:5173"], allow_methods=["*"], allow_headers=["*"])
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=allowed_origins,
+    allow_credentials=False,
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["Content-Type"],
+)
 
 
 @app.get("/health")

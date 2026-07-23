@@ -37,6 +37,33 @@ def test_health_and_demo_contract():
     assert body["evidence"][0]["policy_code"] == "POL-DOC-PJ-02"
 
 
+def test_cors_allows_the_public_frontend():
+    response = client.options(
+        "/v1/cases/analyze-demo",
+        headers={
+            "Origin": "https://nexus-blueprint-core.lovable.app",
+            "Access-Control-Request-Method": "POST",
+            "Access-Control-Request-Headers": "content-type",
+        },
+    )
+    assert response.status_code == 200
+    assert (
+        response.headers["access-control-allow-origin"]
+        == "https://nexus-blueprint-core.lovable.app"
+    )
+
+
+def test_cors_does_not_authorize_unknown_origins():
+    response = client.options(
+        "/v1/cases/analyze-demo",
+        headers={
+            "Origin": "https://untrusted.example",
+            "Access-Control-Request-Method": "POST",
+        },
+    )
+    assert "access-control-allow-origin" not in response.headers
+
+
 def test_gateway_retries_and_is_idempotent():
     request = {
         "case_id": "NXS-2026-0148",
