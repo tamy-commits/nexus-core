@@ -15,6 +15,7 @@ import { NexusSidebar } from "@/components/nexus/Sidebar";
 import { NexusHeader } from "@/components/nexus/Header";
 import { AuditDrawer } from "@/components/nexus/AuditDrawer";
 import { HumanReviewDrawer } from "@/components/nexus/HumanReviewDrawer";
+import { EvidenceDrawer } from "@/components/nexus/EvidenceDrawer";
 import { Toaster } from "@/components/ui/sonner";
 
 function NotFoundComponent() {
@@ -108,6 +109,7 @@ function RootComponent() {
           </div>
           <AuditDrawer />
           <HumanReviewDrawer />
+          <EvidenceDrawer />
           <Toaster position="bottom-right" />
         </div>
       </NexusProvider>

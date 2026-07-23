@@ -1,11 +1,11 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { FlaskConical, Briefcase, GitCompare, RotateCcw } from "lucide-react";
+import { FlaskConical, LayoutDashboard, GitCompare, RotateCcw } from "lucide-react";
 import { useNexus } from "@/lib/nexus-store";
 import { cn } from "@/lib/utils";
 
 const nav = [
-  { to: "/", label: "Scenario Lab", icon: FlaskConical },
-  { to: "/workspace", label: "Case Workspace", icon: Briefcase },
+  { to: "/", label: "Central de Casos", icon: LayoutDashboard },
+  { to: "/lab", label: "Scenario Lab", icon: FlaskConical },
   { to: "/evaluation", label: "Evaluation Studio", icon: GitCompare },
 ] as const;
 

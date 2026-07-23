@@ -6,7 +6,8 @@ import { STATE_LABEL, TECH_LABEL } from "@/lib/scenarios";
 import { StateBadge, TechBadge } from "./Badges";
 
 const titleMap: Record<string, string> = {
-  "/": "Scenario Lab",
+  "/": "Central de Prontidão Documental",
+  "/lab": "Scenario Lab",
   "/workspace": "Case Workspace",
   "/evaluation": "Evaluation Studio",
 };
@@ -15,18 +16,19 @@ export function NexusHeader() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { scenario, setAuditOpen } = useNexus();
   const title = titleMap[pathname] ?? "NEXUS";
+  const showCase = pathname.startsWith("/workspace") && !!scenario;
 
   return (
     <header className="flex h-14 shrink-0 items-center justify-between border-b border-border bg-card px-6">
       <div className="flex items-center gap-4 min-w-0">
         <h1 className="text-[15px] font-semibold text-foreground truncate">{title}</h1>
-        {scenario && (
+        {showCase && scenario && (
           <>
             <span className="h-4 w-px bg-border" />
             <span className="font-mono text-xs text-muted-foreground truncate">
               {scenario.caseId}
             </span>
-            <StateBadge state={scenario.initialState} label={STATE_LABEL[scenario.initialState]} />
+            <StateBadge state={scenario.currentState} label={STATE_LABEL[scenario.currentState]} />
             <TechBadge tech={scenario.tech} label={TECH_LABEL[scenario.tech]} />
           </>
         )}

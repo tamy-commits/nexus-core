@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useNexus } from "@/lib/nexus-store";
@@ -9,24 +10,45 @@ import { toast } from "sonner";
 import { PolicyBadge } from "./Badges";
 
 export function HumanReviewDrawer() {
-  const { reviewOpen, setReviewOpen, scenario } = useNexus();
+  const { reviewOpen, setReviewOpen, scenario, submitHumanReview, humanReviewRecord } = useNexus();
   const [decision, setDecision] = useState<string>("");
   const [justification, setJustification] = useState("");
-  const [adjudicated, setAdjudicated] = useState<string | null>(null);
+  const [actor, setActor] = useState("");
+
+  useEffect(() => {
+    if (!reviewOpen) return;
+    setDecision("");
+    setJustification("");
+    setActor("");
+  }, [reviewOpen, scenario?.caseId]);
+
+  const canSubmit = !!decision && justification.trim().length > 0 && actor.trim().length > 0;
 
   const submit = () => {
-    if (!decision) return;
-    setAdjudicated(`${decision} — registrado localmente`);
-    toast.success("Decisão de revisão registrada (simulação local).");
+    if (!canSubmit) return;
+    submitHumanReview({ decision, justification, actor });
+    toast.success("Decisão de revisão registrada na trilha de auditoria.");
   };
+
+  const options = scenario?.key === "B"
+    ? [
+        "Aplicar POL-DOC-PJ-02 com exceção justificada",
+        "Aplicar POL-KYC-PJ-04 (exigência reforçada)",
+        "Encaminhar para instância superior",
+      ]
+    : [
+        "Ratificar encaminhamento para validação em sombra",
+        "Solicitar ajuste antes do handoff",
+        "Encaminhar para instância superior",
+      ];
 
   return (
     <Sheet open={reviewOpen} onOpenChange={setReviewOpen}>
-      <SheetContent className="w-[520px] sm:max-w-[540px] overflow-y-auto">
+      <SheetContent className="w-[540px] sm:max-w-[560px] overflow-y-auto">
         <SheetHeader>
-          <SheetTitle>Human Review</SheetTitle>
+          <SheetTitle>Revisão humana</SheetTitle>
           <SheetDescription>
-            Adjudicação humana sobre o caso {scenario?.caseId ?? "—"}.
+            Adjudicação obrigatória sobre o caso {scenario?.caseId ?? "—"}.
           </SheetDescription>
         </SheetHeader>
         <div className="mt-6 space-y-6 px-4 pb-10">
@@ -49,7 +71,7 @@ export function HumanReviewDrawer() {
               </section>
 
               <section>
-                <h4 className="text-xs uppercase tracking-wide text-muted-foreground">Políticas e evidências</h4>
+                <h4 className="text-xs uppercase tracking-wide text-muted-foreground">Políticas envolvidas</h4>
                 <ul className="mt-2 space-y-2">
                   {scenario.policies.map((p) => (
                     <li key={p.code} className="rounded-md border border-border bg-card p-3">
@@ -63,50 +85,53 @@ export function HumanReviewDrawer() {
                 </ul>
               </section>
 
-              <section>
-                <h4 className="text-xs uppercase tracking-wide text-muted-foreground">Findings</h4>
-                {scenario.findings.length === 0 ? (
-                  <p className="mt-1 text-sm text-muted-foreground">Sem findings ativos.</p>
-                ) : (
-                  <ul className="mt-1 list-disc pl-5 text-sm text-foreground">
-                    {scenario.findings.map((f, i) => (
-                      <li key={i}>{f}</li>
+              <section className="space-y-4 rounded-md border border-border bg-card p-4">
+                <div>
+                  <Label className="text-xs uppercase tracking-wide text-muted-foreground">
+                    Decisão
+                  </Label>
+                  <RadioGroup value={decision} onValueChange={setDecision} className="mt-2 space-y-1.5">
+                    {options.map((opt, i) => (
+                      <div key={opt} className="flex items-center gap-2">
+                        <RadioGroupItem value={opt} id={`d${i}`} />
+                        <Label htmlFor={`d${i}`} className="text-sm font-normal">{opt}</Label>
+                      </div>
                     ))}
-                  </ul>
-                )}
-              </section>
+                  </RadioGroup>
+                </div>
 
-              <section className="space-y-3 rounded-md border border-border bg-card p-4">
-                <Label className="text-xs uppercase tracking-wide text-muted-foreground">Decisão</Label>
-                <RadioGroup value={decision} onValueChange={setDecision}>
-                  <div className="flex items-center gap-2">
-                    <RadioGroupItem value="Aprovar exceção" id="d1" />
-                    <Label htmlFor="d1" className="text-sm font-normal">Aprovar exceção justificada</Label>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <RadioGroupItem value="Adotar exigência mais restritiva" id="d2" />
-                    <Label htmlFor="d2" className="text-sm font-normal">Adotar exigência mais restritiva</Label>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <RadioGroupItem value="Encaminhar para instância superior" id="d3" />
-                    <Label htmlFor="d3" className="text-sm font-normal">Encaminhar para instância superior</Label>
-                  </div>
-                </RadioGroup>
+                <div>
+                  <Label htmlFor="actor" className="text-xs uppercase tracking-wide text-muted-foreground">
+                    Responsável / papel <span className="text-destructive">*</span>
+                  </Label>
+                  <Input
+                    id="actor"
+                    value={actor}
+                    onChange={(e) => setActor(e.target.value)}
+                    placeholder="Ex.: Ana Souza — Analista PJ Sênior"
+                    className="mt-1"
+                  />
+                </div>
 
                 <div>
                   <Label htmlFor="just" className="text-xs uppercase tracking-wide text-muted-foreground">
-                    Justificativa
+                    Justificativa <span className="text-destructive">*</span>
                   </Label>
                   <Textarea
                     id="just"
                     value={justification}
                     onChange={(e) => setJustification(e.target.value)}
-                    placeholder="Registre a fundamentação da decisão."
-                    className="mt-1 min-h-20 text-sm"
+                    placeholder="Registre a fundamentação da decisão. Campo obrigatório."
+                    className="mt-1 min-h-24 text-sm"
                   />
+                  {!justification.trim() && (
+                    <p className="mt-1 text-[11px] text-muted-foreground">
+                      A justificativa é obrigatória para registrar a decisão.
+                    </p>
+                  )}
                 </div>
 
-                <Button onClick={submit} disabled={!decision} size="sm">
+                <Button onClick={submit} disabled={!canSubmit} size="sm">
                   Registrar decisão
                 </Button>
               </section>
@@ -114,7 +139,16 @@ export function HumanReviewDrawer() {
               <section>
                 <h4 className="text-xs uppercase tracking-wide text-muted-foreground">Decisão adjudicada</h4>
                 <div className="mt-1 min-h-10 rounded-md border border-dashed border-border bg-muted/40 p-3 text-sm text-foreground">
-                  {adjudicated ?? <span className="text-muted-foreground">Aguardando registro.</span>}
+                  {humanReviewRecord ? (
+                    <div className="space-y-1">
+                      <div><span className="text-muted-foreground text-xs">Decisão:</span> {humanReviewRecord.decision}</div>
+                      <div><span className="text-muted-foreground text-xs">Responsável:</span> {humanReviewRecord.actor}</div>
+                      <div><span className="text-muted-foreground text-xs">Registrada às</span> <span className="font-mono">{humanReviewRecord.time}</span></div>
+                      <div className="mt-1 text-xs italic text-foreground/80">"{humanReviewRecord.justification}"</div>
+                    </div>
+                  ) : (
+                    <span className="text-muted-foreground">Aguardando registro.</span>
+                  )}
                 </div>
               </section>
             </>
