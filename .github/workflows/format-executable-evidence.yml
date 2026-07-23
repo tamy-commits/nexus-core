@@ -1,0 +1,26 @@
+name: Format executable evidence
+on:
+  push:
+    branches: [feature/executable-ai-evidence]
+permissions:
+  contents: write
+jobs:
+  format:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/executable-ai-evidence
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+      - run: npx prettier --write src/lib/nexus-api.ts src/lib/nexus-store.tsx src/components/nexus/Header.tsx
+      - run: |
+          if git diff --quiet; then exit 0; fi
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add src/lib/nexus-api.ts src/lib/nexus-store.tsx src/components/nexus/Header.tsx
+          git commit -m "style: format executable evidence frontend"
+          git push
