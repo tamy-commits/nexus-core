@@ -1,0 +1,40 @@
+name: Apply NEXUS hardening
+on:
+  push:
+    branches: [feature/executable-ai-evidence]
+permissions:
+  contents: write
+jobs:
+  harden:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/executable-ai-evidence
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: oven-sh/setup-bun@v2
+      - name: Apply validated patch
+        run: |
+          base64 -d .codex/nexus-hardening.patch.b64 > /tmp/nexus-hardening.patch
+          git apply --check /tmp/nexus-hardening.patch
+          git apply /tmp/nexus-hardening.patch
+      - name: Validate backend
+        run: |
+          python -m pip install -r requirements.txt
+          python -m pytest -q
+      - name: Validate frontend
+        run: |
+          bun install --frozen-lockfile
+          bunx prettier --check src/lib/nexus-api.ts src/lib/nexus-store.tsx src/components/nexus/Header.tsx
+          bunx eslint src/lib/nexus-api.ts src/lib/nexus-store.tsx src/components/nexus/Header.tsx
+          bun run build
+      - name: Publish hardening
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add .env.example api requirements.txt src/lib tests
+          git commit -m 'feat: harden executable evidence vertical slice'
+          git push
