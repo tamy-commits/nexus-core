@@ -12,11 +12,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: feature/executable-ai-evidence
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-      - run: npm ci
-      - run: npx prettier --write src/lib/nexus-api.ts src/lib/nexus-store.tsx src/components/nexus/Header.tsx
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install --frozen-lockfile
+      - run: bunx prettier --write src/lib/nexus-api.ts src/lib/nexus-store.tsx src/components/nexus/Header.tsx
       - run: |
           if git diff --quiet; then exit 0; fi
           git config user.name github-actions[bot]
