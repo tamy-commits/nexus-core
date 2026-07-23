@@ -51,3 +51,16 @@ class DecisionResponse(BaseModel):
     rules_executed: list[str]
     evidence: list[Evidence]
     audit: list[AuditEvent]
+
+
+class HandoffRequest(BaseModel):
+    case_id: str
+    state: str
+    idempotency_key: str
+    failures_before_success: int = Field(default=0, ge=0)
+
+
+class HandoffResponse(BaseModel):
+    status: str
+    idempotency_key: str
+    attempts: int

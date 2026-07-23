@@ -111,6 +111,7 @@ export function NexusProvider({ children }: { children: ReactNode }) {
 
   const simulateDocResend = useCallback(async () => {
     if (!scenario || scenario.key !== "A" || analysisInFlight) return;
+    const original = clone(scenario);
     setAnalysisInFlight(true);
     const working = clone(scenario);
     const doc = working.documents.find((d) => d.id === "endereco");
@@ -144,26 +145,46 @@ export function NexusProvider({ children }: { children: ReactNode }) {
         ? `Execução ${result.run_id} fundamentada em ${result.evidence[0].policy_code} v${result.evidence[0].policy_version}.`
         : "Sem evidência recuperada.";
       next.groundingStatus = result.evidence.length ? "ok" : "insuficiente";
+      next.evidences = result.evidence.map((evidence, index) => ({
+        id: `${result.run_id}-evidence-${index}`,
+        claim: evidence.excerpt,
+        rule: "RET-POLICY-v1",
+        policyCode: evidence.policy_code,
+        policyVersion: evidence.policy_version,
+        policyValidity: "Consultar fonte versionada",
+        excerpt: evidence.excerpt,
+        timestamp: now(),
+      }));
+      if (result.evidence.length) {
+        next.policies = [
+          {
+            code: result.evidence[0].policy_code,
+            title: "Política recuperada pela execução",
+            version: result.evidence[0].policy_version,
+            validity: "Consultar fonte versionada",
+            badge: "Fonte utilizável",
+            excerpts: result.evidence.map((evidence) => evidence.excerpt),
+          },
+        ];
+      }
       next.audit.push(
-        ...result.audit.map(
-          (event, index): AuditEvent => ({
-            id: `${result.run_id}-${index}`,
-            time: now(),
-            actor: event.actor,
-            action: event.action,
-            rule: event.rule,
-            finding: event.finding,
-            from: event.from_state,
-            to: event.to_state,
-          }),
-        ),
+        ...result.audit.map((event, index): AuditEvent => ({
+          id: `${result.run_id}-${index}`,
+          time: now(),
+          actor: event.actor,
+          action: event.action,
+          rule: event.rule,
+          finding: event.finding,
+          from: event.from_state,
+          to: event.to_state,
+        })),
       );
       setExecutionMode(result.mode);
       setLastRunId(result.run_id);
       setScenario(next);
       syncCase(next);
     } catch (error) {
-      const fallback = clone(working);
+      const fallback = clone(original);
       fallback.tech = "BLOQUEADO_TECNICO";
       fallback.currentState = "AGUARDANDO_CORRECAO";
       fallback.findings = ["API_INDISPONIVEL — avanço bloqueado com segurança."];
