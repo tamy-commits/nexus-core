@@ -13,9 +13,10 @@ function displayActor(event: AuditEvent) {
 }
 
 export function AuditDrawer() {
-  const { auditOpen, setAuditOpen, scenario } = useNexus();
-  const execution = scenario
-    ? getExecutionConfig(scenario.caseId, scenario.key)
+  const { auditOpen, setAuditOpen, scenario, lastRunId } = useNexus();
+  const baseExecution = scenario ? getExecutionConfig(scenario.caseId, scenario.key) : null;
+  const execution = baseExecution
+    ? { ...baseExecution, runId: lastRunId ?? baseExecution.runId }
     : null;
 
   return (

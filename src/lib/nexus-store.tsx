@@ -95,6 +95,8 @@ export function NexusProvider({ children }: { children: ReactNode }) {
     setActiveKey(key);
     setScenario(clone(base));
     setHumanReviewRecord(null);
+    setExecutionMode("DEMO");
+    setLastRunId(null);
   }, []);
   const resetScenario = useCallback(() => {
     if (!activeKey) return;
