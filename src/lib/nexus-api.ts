@@ -23,12 +23,14 @@ export interface NexusDecision {
 }
 
 const API_URL = import.meta.env.VITE_NEXUS_API_URL ?? "http://localhost:8000";
+const EXECUTION_MODE = import.meta.env.VITE_NEXUS_EXECUTION_MODE ?? "DEMO";
 
 export async function analyzeDocumentCase(
   scenario: Scenario,
   issuedAt: string,
 ): Promise<NexusDecision> {
-  const response = await fetch(`${API_URL}/v1/cases/analyze-demo`, {
+  const endpoint = EXECUTION_MODE === "LIVE" ? "analyze" : "analyze-demo";
+  const response = await fetch(`${API_URL}/v1/cases/${endpoint}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({

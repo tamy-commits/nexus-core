@@ -21,7 +21,7 @@ class PolicyRetriever:
     def __init__(self, knowledge_dir: Path):
         self.documents = list(knowledge_dir.glob("*.md"))
 
-    def retrieve(self, query: str, limit: int = 3) -> list[PolicyChunk]:
+    def retrieve(self, query: str, limit: int = 3, min_score: float = 0.25) -> list[PolicyChunk]:
         query_tokens = _tokens(query)
         ranked: list[PolicyChunk] = []
         for path in self.documents:
@@ -33,4 +33,8 @@ class PolicyRetriever:
                 overlap = len(query_tokens & paragraph_tokens)
                 score = overlap / max(len(query_tokens), 1)
                 ranked.append(PolicyChunk(code=metadata.get("code", path.stem).strip(), version=metadata.get("version", "unknown").strip(), text=paragraph, score=round(score, 4)))
-        return sorted(ranked, key=lambda chunk: chunk.score, reverse=True)[:limit]
+        return [
+            chunk
+            for chunk in sorted(ranked, key=lambda chunk: chunk.score, reverse=True)
+            if chunk.score >= min_score
+        ][:limit]
