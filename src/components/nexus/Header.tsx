@@ -30,6 +30,9 @@ export function NexusHeader() {
             </span>
             <StateBadge state={scenario.currentState} label={STATE_LABEL[scenario.currentState]} />
             <TechBadge tech={scenario.tech} label={TECH_LABEL[scenario.tech]} />
+            <span className="hidden rounded-full border border-border bg-muted/40 px-2 py-0.5 text-[10px] font-medium text-muted-foreground xl:inline-flex">
+              Simulação controlada · modelo não conectado
+            </span>
           </>
         )}
       </div>
