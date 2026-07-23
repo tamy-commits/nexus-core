@@ -25,16 +25,25 @@ export function NexusHeader() {
         {showCase && scenario && (
           <>
             <span className="h-4 w-px bg-border" />
-            <span className="truncate font-mono text-xs text-muted-foreground">{scenario.caseId}</span>
+            <span className="truncate font-mono text-xs text-muted-foreground">
+              {scenario.caseId}
+            </span>
             <StateBadge state={scenario.currentState} label={STATE_LABEL[scenario.currentState]} />
             <TechBadge tech={scenario.tech} label={TECH_LABEL[scenario.tech]} />
             <span className="hidden rounded-full border border-border bg-muted/40 px-2 py-0.5 font-mono text-[10px] font-medium text-muted-foreground xl:inline-flex">
-              {analysisInFlight ? "PROCESSANDO" : executionMode}{lastRunId ? ` · ${lastRunId}` : ""}
+              {analysisInFlight ? "PROCESSANDO" : executionMode}
+              {lastRunId ? ` · ${lastRunId}` : ""}
             </span>
           </>
         )}
       </div>
-      <Button variant="outline" size="sm" onClick={() => setAuditOpen(true)} disabled={!scenario} className="gap-2">
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => setAuditOpen(true)}
+        disabled={!scenario}
+        className="gap-2"
+      >
         <ScrollText className="h-3.5 w-3.5" />
         Ver auditoria
       </Button>
