@@ -109,6 +109,7 @@ function RootComponent() {
           </div>
           <AuditDrawer />
           <HumanReviewDrawer />
+          <EvidenceDrawer />
           <Toaster position="bottom-right" />
         </div>
       </NexusProvider>
