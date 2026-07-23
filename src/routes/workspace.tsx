@@ -1,9 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Check, FileText, ShieldAlert, UserCog, ArrowRight, Sparkles } from "lucide-react";
+import { Check, FileText, ShieldAlert, UserCog, ArrowRight, Sparkles, RefreshCw, ScrollText } from "lucide-react";
 import { useNexus } from "@/lib/nexus-store";
-import { STEPS, STATE_LABEL } from "@/lib/scenarios";
+import { STEPS, STATE_LABEL, TECH_LABEL } from "@/lib/scenarios";
 import { Button } from "@/components/ui/button";
-import { DocStatusBadge, PolicyBadge, NeutralBadge } from "@/components/nexus/Badges";
+import { DocStatusBadge, PolicyBadge, NeutralBadge, StateBadge, TechBadge } from "@/components/nexus/Badges";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/workspace")({
@@ -19,23 +19,33 @@ export const Route = createFileRoute("/workspace")({
 });
 
 function Workspace() {
-  const { scenario, currentStepIndex, simulateDocResend, setReviewOpen } = useNexus();
+  const {
+    scenario,
+    currentStepIndex,
+    simulateDocResend,
+    retryIntegration,
+    retryInFlight,
+    setReviewOpen,
+    setAuditOpen,
+    setEvidenceOpen,
+  } = useNexus();
 
   if (!scenario) {
     return (
       <div className="mx-auto max-w-xl px-8 py-24 text-center">
         <div className="text-display text-2xl text-foreground">Nenhum caso ativo</div>
         <p className="mt-2 text-sm text-muted-foreground">
-          Selecione um cenário no Scenario Lab para instanciar um caso.
+          Abra um caso pela Central de Prontidão Documental.
         </p>
         <Button asChild className="mt-6" size="sm">
-          <Link to="/">Ir para o Scenario Lab</Link>
+          <Link to="/">Ir para a Central de Casos</Link>
         </Button>
       </div>
     );
   }
 
   const showReview = scenario.key === "B" || scenario.key === "D";
+  const showRetry = scenario.key === "C" && scenario.tech === "AGUARDANDO_RETRY";
 
   return (
     <div className="mx-auto max-w-[1400px] px-6 py-6">
@@ -128,7 +138,12 @@ function Workspace() {
                   </ul>
                 </div>
               ))}
-              <Button variant="ghost" size="sm" className="w-full justify-between">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-full justify-between"
+                onClick={() => setEvidenceOpen(true)}
+              >
                 Ver evidências
                 <ArrowRight className="h-3.5 w-3.5" />
               </Button>
@@ -206,10 +221,23 @@ function Workspace() {
               Decision Trace
             </h3>
 
-            <dl className="mt-3 space-y-2 text-xs">
-              <Row label="Estado atual" value={STATE_LABEL[scenario.initialState]} />
-              <Row label="Condição técnica" value={scenario.tech} mono />
-              <Row label="Próximo estado" value={STATE_LABEL[scenario.nextState]} />
+            <dl className="mt-3 space-y-2.5 text-xs">
+              <div className="flex items-center justify-between gap-2">
+                <dt className="text-muted-foreground">Estado inicial</dt>
+                <dd><StateBadge state={scenario.initialState} label={STATE_LABEL[scenario.initialState]} /></dd>
+              </div>
+              <div className="flex items-center justify-between gap-2">
+                <dt className="text-muted-foreground">Estado atual</dt>
+                <dd><StateBadge state={scenario.currentState} label={STATE_LABEL[scenario.currentState]} /></dd>
+              </div>
+              <div className="flex items-center justify-between gap-2">
+                <dt className="text-muted-foreground">Transição proposta</dt>
+                <dd><StateBadge state={scenario.nextState} label={STATE_LABEL[scenario.nextState]} /></dd>
+              </div>
+              <div className="flex items-center justify-between gap-2">
+                <dt className="text-muted-foreground">Condição técnica</dt>
+                <dd><TechBadge tech={scenario.tech} label={TECH_LABEL[scenario.tech]} /></dd>
+              </div>
             </dl>
 
             <div className="mt-4">
@@ -240,26 +268,57 @@ function Workspace() {
                   <Sparkles className="h-3 w-3" /> Recomendação do agente
                 </div>
                 <p className="mt-1 text-xs text-foreground">{scenario.recommendation}</p>
+                <p className="mt-1.5 text-[10px] uppercase tracking-wider text-muted-foreground">
+                  O agente não altera o estado — apenas propõe.
+                </p>
               </div>
 
               <div className="rounded-md border border-primary/30 bg-primary/5 p-3">
                 <div className="flex items-center gap-1.5 text-[11px] uppercase tracking-wider text-primary">
-                  <ShieldAlert className="h-3 w-3" /> Decisão autorizada
+                  <ShieldAlert className="h-3 w-3" /> Ação autorizada
                 </div>
                 <p className="mt-1 text-xs text-foreground">{scenario.authorizedAction}</p>
               </div>
             </div>
 
-            <div className="mt-4 rounded-md border border-border bg-muted/30 p-3">
+            <div className={cn(
+              "mt-4 rounded-md border p-3",
+              scenario.groundingStatus === "ok"
+                ? "border-border bg-muted/30"
+                : "border-warning/35 bg-warning/10",
+            )}>
               <div className="text-[11px] uppercase tracking-wider text-muted-foreground">Grounding</div>
-              <p className="mt-1 text-xs text-foreground">{scenario.grounding}</p>
+              <p className="mt-1 text-xs text-foreground">
+                {scenario.groundingStatus === "insuficiente"
+                  ? "Sem evidência suficiente — decisão automática bloqueada."
+                  : scenario.grounding}
+              </p>
             </div>
 
-            <Button variant="ghost" size="sm" className="mt-4 w-full justify-between">
-              Abrir trilha completa
+            <Button
+              variant="ghost"
+              size="sm"
+              className="mt-4 w-full justify-between"
+              onClick={() => setAuditOpen(true)}
+            >
+              <span className="inline-flex items-center gap-1.5">
+                <ScrollText className="h-3.5 w-3.5" /> Abrir trilha completa
+              </span>
               <ArrowRight className="h-3.5 w-3.5" />
             </Button>
           </section>
+
+          {showRetry && (
+            <Button
+              variant="outline"
+              className="w-full gap-2"
+              onClick={retryIntegration}
+              disabled={retryInFlight}
+            >
+              <RefreshCw className={cn("h-4 w-4", retryInFlight && "animate-spin")} />
+              {retryInFlight ? "Reexecutando…" : "Tentar novamente"}
+            </Button>
+          )}
 
           {showReview && (
             <Button

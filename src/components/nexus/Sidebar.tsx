@@ -1,11 +1,11 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { FlaskConical, Briefcase, GitCompare, RotateCcw } from "lucide-react";
+import { FlaskConical, LayoutDashboard, GitCompare, RotateCcw } from "lucide-react";
 import { useNexus } from "@/lib/nexus-store";
 import { cn } from "@/lib/utils";
 
 const nav = [
-  { to: "/", label: "Scenario Lab", icon: FlaskConical },
-  { to: "/workspace", label: "Case Workspace", icon: Briefcase },
+  { to: "/", label: "Central de Casos", icon: LayoutDashboard },
+  { to: "/lab", label: "Scenario Lab", icon: FlaskConical },
   { to: "/evaluation", label: "Evaluation Studio", icon: GitCompare },
 ] as const;
 
@@ -27,7 +27,7 @@ export function NexusSidebar() {
       <nav className="flex-1 px-3">
         <ul className="space-y-0.5">
           {nav.map((n) => {
-            const active = pathname === n.to;
+            const active = pathname === n.to || (n.to === "/workspace" && pathname.startsWith("/workspace"));
             const Icon = n.icon;
             return (
               <li key={n.to}>

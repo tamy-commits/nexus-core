@@ -2,17 +2,21 @@ import { cn } from "@/lib/utils";
 import type { ProcessState, TechCondition, DocStatus } from "@/lib/scenarios";
 
 const stateStyles: Record<ProcessState, string> = {
+  CRIADA: "bg-muted text-muted-foreground border-border",
   EM_PREPARACAO: "bg-warning/15 text-warning-foreground border-warning/30",
-  PRONTA_PARA_SUBMISSAO: "bg-success/15 text-success border-success/30",
+  AGUARDANDO_CORRECAO: "bg-warning/15 text-warning-foreground border-warning/35",
   EM_REVISAO_HUMANA: "bg-info/15 text-info border-info/30",
-  VALIDACAO_SOMBRA: "bg-accent text-accent-foreground border-accent",
-  BLOQUEADO: "bg-destructive/10 text-destructive border-destructive/30",
+  PRONTA_PARA_SUBMISSAO: "bg-success/15 text-success border-success/30",
+  EM_VALIDACAO_SOMBRA: "bg-accent text-accent-foreground border-accent",
+  ENCAMINHADA_AO_N2: "bg-info/15 text-info border-info/30",
+  ENCAMINHADA_TRATAMENTO_ESPECIALIZADO: "bg-info/15 text-info border-info/30",
+  CANCELADA: "bg-muted text-muted-foreground border-border",
 };
 
 const techStyles: Record<TechCondition, string> = {
   NORMAL: "bg-muted text-muted-foreground border-border",
   AGUARDANDO_RETRY: "bg-warning/15 text-warning-foreground border-warning/30",
-  DEGRADADO: "bg-destructive/10 text-destructive border-destructive/30",
+  BLOQUEADO_TECNICO: "bg-destructive/10 text-destructive border-destructive/30",
 };
 
 const docStyles: Record<DocStatus, string> = {
