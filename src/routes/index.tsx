@@ -11,7 +11,7 @@ export const Route = createFileRoute("/")({
       { title: "Scenario Lab — NEXUS" },
       { name: "description", content: "Central inteligente de prontidão documental — laboratório de cenários demonstrativos." },
       { property: "og:title", content: "Scenario Lab — NEXUS" },
-      { property: "og:description", content: "Explore cenários de prontidão documental corporativa." },
+      { property: "og:description", content: "Central inteligente de prontidão documental — laboratório de cenários demonstrativos." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
