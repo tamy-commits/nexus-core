@@ -7,6 +7,7 @@ import {
   type ProcessState,
   type TechCondition,
 } from "./scenarios";
+import { analyzeDocumentCase } from "./nexus-api";
 
 export interface CaseSnapshot {
   key: Scenario["key"];
@@ -44,18 +45,18 @@ interface NexusState {
   currentStepIndex: number;
   humanReviewRecord: (HumanReviewSubmission & { time: string }) | null;
   retryInFlight: boolean;
+  analysisInFlight: boolean;
+  executionMode: "LIVE" | "DEMO" | "FALLBACK";
+  lastRunId: string | null;
 }
 
 const Ctx = createContext<NexusState | null>(null);
-
 function clone<T>(v: T): T {
   return JSON.parse(JSON.stringify(v));
 }
-
 function now() {
   return new Date().toTimeString().slice(0, 5);
 }
-
 function snapshot(s: Scenario): CaseSnapshot {
   return {
     key: s.key,
@@ -81,11 +82,13 @@ export function NexusProvider({ children }: { children: ReactNode }) {
     (HumanReviewSubmission & { time: string }) | null
   >(null);
   const [retryInFlight, setRetryInFlight] = useState(false);
+  const [analysisInFlight, setAnalysisInFlight] = useState(false);
+  const [executionMode, setExecutionMode] = useState<"LIVE" | "DEMO" | "FALLBACK">("DEMO");
+  const [lastRunId, setLastRunId] = useState<string | null>(null);
 
   const syncCase = useCallback((s: Scenario) => {
     setCases((prev) => prev.map((c) => (c.key === s.key ? snapshot(s) : c)));
   }, []);
-
   const loadScenario = useCallback((key: Scenario["key"]) => {
     const base = SCENARIOS.find((s) => s.key === key);
     if (!base) return;
@@ -93,7 +96,6 @@ export function NexusProvider({ children }: { children: ReactNode }) {
     setScenario(clone(base));
     setHumanReviewRecord(null);
   }, []);
-
   const resetScenario = useCallback(() => {
     if (!activeKey) return;
     const base = SCENARIOS.find((s) => s.key === activeKey);
@@ -103,67 +105,105 @@ export function NexusProvider({ children }: { children: ReactNode }) {
     syncCase(fresh);
     setHumanReviewRecord(null);
     setRetryInFlight(false);
+    setExecutionMode("DEMO");
+    setLastRunId(null);
   }, [activeKey, syncCase]);
 
-  const simulateDocResend = useCallback(() => {
-    setScenario((prev) => {
-      if (!prev || prev.key !== "A") return prev;
-      const next = clone(prev);
-      const doc = next.documents.find((d) => d.id === "endereco");
-      if (!doc) return next;
-      doc.file = "comprovante_endereco_v2.pdf";
-      doc.version = 2;
-      doc.validity = "15/08/2026";
-      doc.status = "Em revalidação";
-      doc.finding = undefined;
-      doc.action = undefined;
-      doc.highlight = true;
-
-      // Transição: AGUARDANDO_CORRECAO → EM_PREPARACAO (revalidando dependências)
-      next.currentState = "EM_PREPARACAO";
-      next.currentStep = "Documentos";
-      next.findings = ["Reexecução em andamento — revalidando gates R-DOC-04."];
-      next.lastUpdate = now();
-
-      const t = now();
-      const events: AuditEvent[] = [
-        { id: `ev-${Date.now()}-1`, time: t, actor: "Gerente PJ", action: "Envio de nova versão do documento", version: "v2" },
-        { id: `ev-${Date.now()}-2`, time: t, actor: "Regra", action: "Reexecução parcial (R-DOC-04)", rule: "R-DOC-04" },
-        { id: `ev-${Date.now()}-3`, time: t, actor: "Sistema", action: "Transição de estado", from: "AGUARDANDO_CORRECAO", to: "EM_PREPARACAO" },
-      ];
-      next.audit = [...next.audit, ...events];
+  const simulateDocResend = useCallback(async () => {
+    if (!scenario || scenario.key !== "A" || analysisInFlight) return;
+    const original = clone(scenario);
+    setAnalysisInFlight(true);
+    const working = clone(scenario);
+    const doc = working.documents.find((d) => d.id === "endereco");
+    if (!doc) {
+      setAnalysisInFlight(false);
+      return;
+    }
+    doc.file = "comprovante_endereco_v2.pdf";
+    doc.version = 2;
+    doc.validity = "15/08/2026";
+    doc.status = "Em revalidação";
+    doc.finding = undefined;
+    doc.action = undefined;
+    working.currentState = "EM_PREPARACAO";
+    working.findings = ["API NEXUS em execução — revalidando política e gate documental."];
+    setScenario(working);
+    syncCase(working);
+    try {
+      const result = await analyzeDocumentCase(working, "2026-08-15");
+      const next = clone(working);
+      const updated = next.documents.find((d) => d.id === "endereco");
+      if (updated) updated.status = "Atendido";
+      next.currentState = result.current_state;
+      next.nextState = result.next_state;
+      next.currentStep = result.decision === "PRONTA_PARA_SUBMISSAO" ? "Revisão" : "Documentos";
+      next.findings = result.reason_code ? [result.reason_code] : [];
+      next.recommendation = result.recommendation;
+      next.authorizedAction = result.authorized_action;
+      next.rulesExecuted = result.rules_executed;
+      next.grounding = result.evidence.length
+        ? `Execução ${result.run_id} fundamentada em ${result.evidence[0].policy_code} v${result.evidence[0].policy_version}.`
+        : "Sem evidência recuperada.";
+      next.groundingStatus = result.evidence.length ? "ok" : "insuficiente";
+      next.evidences = result.evidence.map((evidence, index) => ({
+        id: `${result.run_id}-evidence-${index}`,
+        claim: evidence.excerpt,
+        rule: "RET-POLICY-v1",
+        policyCode: evidence.policy_code,
+        policyVersion: evidence.policy_version,
+        policyValidity: "Consultar fonte versionada",
+        excerpt: evidence.excerpt,
+        timestamp: now(),
+      }));
+      if (result.evidence.length) {
+        next.policies = [
+          {
+            code: result.evidence[0].policy_code,
+            title: "Política recuperada pela execução",
+            version: result.evidence[0].policy_version,
+            validity: "Consultar fonte versionada",
+            badge: "Fonte utilizável",
+            excerpts: result.evidence.map((evidence) => evidence.excerpt),
+          },
+        ];
+      }
+      next.audit.push(
+        ...result.audit.map((event, index): AuditEvent => ({
+          id: `${result.run_id}-${index}`,
+          time: now(),
+          actor: event.actor,
+          action: event.action,
+          rule: event.rule,
+          finding: event.finding,
+          from: event.from_state,
+          to: event.to_state,
+        })),
+      );
+      setExecutionMode(result.mode);
+      setLastRunId(result.run_id);
+      setScenario(next);
       syncCase(next);
-
-      setTimeout(() => {
-        setScenario((s) => {
-          if (!s || s.key !== "A") return s;
-          const n = clone(s);
-          const d = n.documents.find((x) => x.id === "endereco");
-          if (d) {
-            d.status = "Atendido";
-            d.highlight = false;
-          }
-          // Apenas após todos os gates aplicáveis aprovados
-          n.currentState = "PRONTA_PARA_SUBMISSAO";
-          n.currentStep = "Revisão";
-          n.findings = [];
-          n.recommendation = "Encaminhar para validação em sombra (N1) antes de qualquer submissão.";
-          n.authorizedAction = "Handoff controlado para validação em sombra.";
-          n.nextState = "EM_VALIDACAO_SOMBRA";
-          n.lastUpdate = now();
-          const t2 = now();
-          n.audit.push(
-            { id: `ev-${Date.now()}-4`, time: t2, actor: "Regra", action: "Gate R-DOC-04 aprovado", rule: "R-DOC-04", finding: "OK" },
-            { id: `ev-${Date.now()}-5`, time: t2, actor: "Sistema", action: "Transição de estado", from: "EM_PREPARACAO", to: "PRONTA_PARA_SUBMISSAO" },
-          );
-          syncCase(n);
-          return n;
-        });
-      }, 1600);
-
-      return next;
-    });
-  }, [syncCase]);
+    } catch (error) {
+      const fallback = clone(original);
+      fallback.tech = "BLOQUEADO_TECNICO";
+      fallback.currentState = "AGUARDANDO_CORRECAO";
+      fallback.findings = ["API_INDISPONIVEL — avanço bloqueado com segurança."];
+      fallback.recommendation = "Iniciar a API NEXUS e reexecutar a validação.";
+      fallback.audit.push({
+        id: `fallback-${Date.now()}`,
+        time: now(),
+        actor: "Guardrail",
+        action: error instanceof Error ? error.message : "Falha desconhecida na API",
+        rule: "G-FAIL-CLOSED-01",
+        finding: "API_INDISPONIVEL",
+      });
+      setExecutionMode("FALLBACK");
+      setScenario(fallback);
+      syncCase(fallback);
+    } finally {
+      setAnalysisInFlight(false);
+    }
+  }, [analysisInFlight, scenario, syncCase]);
 
   const retryIntegration = useCallback(() => {
     if (retryInFlight) return;
@@ -182,12 +222,10 @@ export function NexusProvider({ children }: { children: ReactNode }) {
       syncCase(next);
       return next;
     });
-
     setTimeout(() => {
       setScenario((s) => {
         if (!s || s.key !== "C") return s;
         const n = clone(s);
-        // Sucesso sintético controlado
         n.tech = "NORMAL";
         n.findings = [];
         n.currentStep = "Revisão";
@@ -198,9 +236,28 @@ export function NexusProvider({ children }: { children: ReactNode }) {
         n.lastUpdate = now();
         const t = now();
         n.audit.push(
-          { id: `ev-${Date.now()}-r2`, time: t, actor: "Sistema", action: "Consulta externa retornou com sucesso", finding: "OK" },
-          { id: `ev-${Date.now()}-r3`, time: t, actor: "Regra", action: "Condição técnica normalizada", rule: "R-INT-03" },
-          { id: `ev-${Date.now()}-r4`, time: t, actor: "Sistema", action: "Transição de estado", from: "EM_PREPARACAO", to: "PRONTA_PARA_SUBMISSAO" },
+          {
+            id: `ev-${Date.now()}-r2`,
+            time: t,
+            actor: "Sistema",
+            action: "Consulta externa retornou com sucesso",
+            finding: "OK",
+          },
+          {
+            id: `ev-${Date.now()}-r3`,
+            time: t,
+            actor: "Regra",
+            action: "Condição técnica normalizada",
+            rule: "R-INT-03",
+          },
+          {
+            id: `ev-${Date.now()}-r4`,
+            time: t,
+            actor: "Sistema",
+            action: "Transição de estado",
+            from: "EM_PREPARACAO",
+            to: "PRONTA_PARA_SUBMISSAO",
+          },
         );
         syncCase(n);
         return n;
@@ -212,7 +269,12 @@ export function NexusProvider({ children }: { children: ReactNode }) {
   const submitHumanReview = useCallback(
     ({ decision, justification, actor }: HumanReviewSubmission) => {
       if (!decision || !justification.trim() || !actor.trim()) return;
-      const record = { decision, justification: justification.trim(), actor: actor.trim(), time: now() };
+      const record = {
+        decision,
+        justification: justification.trim(),
+        actor: actor.trim(),
+        time: now(),
+      };
       setHumanReviewRecord(record);
       setScenario((prev) => {
         if (!prev) return prev;
@@ -248,11 +310,10 @@ export function NexusProvider({ children }: { children: ReactNode }) {
     [syncCase],
   );
 
-  const currentStepIndex = useMemo(() => {
-    if (!scenario) return 0;
-    return STEPS.indexOf(scenario.currentStep as (typeof STEPS)[number]);
-  }, [scenario]);
-
+  const currentStepIndex = useMemo(
+    () => (scenario ? STEPS.indexOf(scenario.currentStep as (typeof STEPS)[number]) : 0),
+    [scenario],
+  );
   const value: NexusState = {
     activeKey,
     scenario,
@@ -271,8 +332,10 @@ export function NexusProvider({ children }: { children: ReactNode }) {
     currentStepIndex,
     humanReviewRecord,
     retryInFlight,
+    analysisInFlight,
+    executionMode,
+    lastRunId,
   };
-
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }
 

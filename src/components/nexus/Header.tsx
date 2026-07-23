@@ -14,24 +14,25 @@ const titleMap: Record<string, string> = {
 
 export function NexusHeader() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const { scenario, setAuditOpen } = useNexus();
+  const { scenario, setAuditOpen, executionMode, lastRunId, analysisInFlight } = useNexus();
   const title = titleMap[pathname] ?? "NEXUS";
   const showCase = pathname.startsWith("/workspace") && !!scenario;
 
   return (
     <header className="flex h-14 shrink-0 items-center justify-between border-b border-border bg-card px-6">
-      <div className="flex items-center gap-4 min-w-0">
-        <h1 className="text-[15px] font-semibold text-foreground truncate">{title}</h1>
+      <div className="flex min-w-0 items-center gap-4">
+        <h1 className="truncate text-[15px] font-semibold text-foreground">{title}</h1>
         {showCase && scenario && (
           <>
             <span className="h-4 w-px bg-border" />
-            <span className="font-mono text-xs text-muted-foreground truncate">
+            <span className="truncate font-mono text-xs text-muted-foreground">
               {scenario.caseId}
             </span>
             <StateBadge state={scenario.currentState} label={STATE_LABEL[scenario.currentState]} />
             <TechBadge tech={scenario.tech} label={TECH_LABEL[scenario.tech]} />
-            <span className="hidden rounded-full border border-border bg-muted/40 px-2 py-0.5 text-[10px] font-medium text-muted-foreground xl:inline-flex">
-              Simulação controlada · modelo não conectado
+            <span className="hidden rounded-full border border-border bg-muted/40 px-2 py-0.5 font-mono text-[10px] font-medium text-muted-foreground xl:inline-flex">
+              {analysisInFlight ? "PROCESSANDO" : executionMode}
+              {lastRunId ? ` · ${lastRunId}` : ""}
             </span>
           </>
         )}
