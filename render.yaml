@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: nexus-executable-evidence-api
+    runtime: docker
+    plan: free
+    region: virginia
+    dockerfilePath: ./Dockerfile.api
+    healthCheckPath: /health
+    autoDeployTrigger: checksPass
+    envVars:
+      - key: ALLOWED_ORIGINS
+        value: https://nexus-blueprint-core.lovable.app
