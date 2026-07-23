@@ -1,24 +1,115 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { ArrowRight, AlertTriangle, GitBranch, WifiOff, CheckCircle2 } from "lucide-react";
+import { SCENARIOS, STATE_LABEL } from "@/lib/scenarios";
+import { useNexus } from "@/lib/nexus-store";
+import { StateBadge } from "@/components/nexus/Badges";
+import { cn } from "@/lib/utils";
 
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
 export const Route = createFileRoute("/")({
-  component: Index,
+  head: () => ({
+    meta: [
+      { title: "Scenario Lab — NEXUS" },
+      { name: "description", content: "Central inteligente de prontidão documental — laboratório de cenários demonstrativos." },
+      { property: "og:title", content: "Scenario Lab — NEXUS" },
+      { property: "og:description", content: "Explore cenários de prontidão documental corporativa." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
+  component: ScenarioLab,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
-function Index() {
+const iconMap = {
+  A: AlertTriangle,
+  B: GitBranch,
+  C: WifiOff,
+  D: CheckCircle2,
+} as const;
+
+function ScenarioLab() {
+  const { loadScenario } = useNexus();
+  const navigate = useNavigate();
+
+  const open = (key: "A" | "B" | "C" | "D") => {
+    loadScenario(key);
+    navigate({ to: "/workspace" });
+  };
+
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
+    <div className="mx-auto max-w-6xl px-8 py-10">
+      <div className="mb-8">
+        <div className="text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
+          Laboratório de cenários
+        </div>
+        <h2 className="text-display mt-1 text-3xl text-foreground">
+          Selecione um cenário para instanciar um caso
+        </h2>
+        <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+          Cada cenário carrega dados pré-configurados que reproduzem uma condição
+          representativa da operação de prontidão documental.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        {SCENARIOS.map((s) => {
+          const Icon = iconMap[s.key];
+          const featured = s.featured;
+          return (
+            <button
+              key={s.key}
+              onClick={() => open(s.key)}
+              className={cn(
+                "group relative flex flex-col rounded-xl border bg-card p-6 text-left transition-all",
+                "hover:border-primary/40 hover:shadow-[0_4px_24px_-8px_color-mix(in_oklab,var(--color-primary)_25%,transparent)]",
+                featured
+                  ? "border-primary/40 ring-1 ring-primary/20 md:col-span-2"
+                  : "border-border",
+              )}
+            >
+              {featured && (
+                <span className="absolute -top-2.5 left-6 rounded-full border border-primary/30 bg-card px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-primary">
+                  Demonstração principal
+                </span>
+              )}
+
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex items-start gap-3">
+                  <div className={cn(
+                    "grid h-10 w-10 shrink-0 place-items-center rounded-lg",
+                    featured ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground",
+                  )}>
+                    <Icon className="h-5 w-5" strokeWidth={1.6} />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="text-[11px] uppercase tracking-wider text-muted-foreground">
+                      {s.category}
+                    </div>
+                    <h3 className="mt-0.5 text-lg font-semibold text-foreground">{s.title}</h3>
+                  </div>
+                </div>
+                <StateBadge state={s.initialState} label={STATE_LABEL[s.initialState]} />
+              </div>
+
+              <p className="mt-4 text-sm text-foreground/80">{s.short}</p>
+
+              <dl className="mt-5 grid grid-cols-2 gap-y-2 text-xs">
+                <dt className="text-muted-foreground">Risco demonstrado</dt>
+                <dd className="text-foreground">{s.risk}</dd>
+                <dt className="text-muted-foreground">Duração estimada</dt>
+                <dd className="text-foreground">{s.duration}</dd>
+                <dt className="text-muted-foreground">Case ID</dt>
+                <dd className="font-mono text-foreground">{s.caseId}</dd>
+              </dl>
+
+              <div className="mt-6 flex items-center justify-end">
+                <span className="inline-flex items-center gap-1.5 text-sm font-medium text-primary group-hover:gap-2 transition-all">
+                  Abrir caso <ArrowRight className="h-4 w-4" />
+                </span>
+              </div>
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }
