@@ -27,7 +27,7 @@ export function NexusSidebar() {
       <nav className="flex-1 px-3">
         <ul className="space-y-0.5">
           {nav.map((n) => {
-            const active = pathname === n.to || (n.to === "/workspace" && pathname.startsWith("/workspace"));
+            const active = pathname === n.to;
             const Icon = n.icon;
             return (
               <li key={n.to}>
