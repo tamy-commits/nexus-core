@@ -35,20 +35,24 @@ const rows: Array<{ dim: string; baseline: string; agent: string; verdict: Verdi
   },
   {
     dim: "Recuperação de política, versão e vigência",
-    baseline: "Consulta por chaves e precedências previamente configuradas; sem síntese contextual.",
-    agent: "No desenho-alvo, recupera candidatos e produz síntese fundamentada; no MVP, a recuperação é controlada e sintética.",
+    baseline:
+      "Consulta por chaves e precedências previamente configuradas; sem síntese contextual.",
+    agent:
+      "No desenho-alvo, recupera candidatos e produz síntese fundamentada; no MVP, a recuperação é controlada e sintética.",
     verdict: "Orquestração agrega contexto",
   },
   {
     dim: "Correção e revalidação",
     baseline: "Usa mapa determinístico de dependências para reexecutar apenas os gates afetados.",
-    agent: "Explica quais dependências foram afetadas e recomenda o próximo passo, sem alterar o estado.",
+    agent:
+      "Explica quais dependências foram afetadas e recomenda o próximo passo, sem alterar o estado.",
     verdict: "Orquestração agrega contexto",
   },
   {
     dim: "Comunicação com o operador",
     baseline: "Usa mensagens padronizadas por reason code e política aplicável.",
-    agent: "No desenho-alvo, redige comunicação contextual a partir da decisão consolidada e das fontes.",
+    agent:
+      "No desenho-alvo, redige comunicação contextual a partir da decisão consolidada e das fontes.",
     verdict: "Orquestração agrega contexto",
   },
   {
@@ -108,12 +112,11 @@ function Evaluation() {
         </h2>
         <p className="mt-3 max-w-3xl text-sm text-muted-foreground">
           Ambas as abordagens recebem os mesmos dados, executam as mesmas regras objetivas e
-          preservam os mesmos guardrails. O diferencial esperado da orquestração está na
-          recuperação contextual, síntese e comunicação — não na propriedade exclusiva dos
-          mecanismos de segurança. No MVP, esse comportamento é representado por simulação
-          controlada: não há modelo de linguagem nem RAG vetorial conectado. Esta tela é uma
-          matriz de capacidades, não um benchmark executado, e não declara ganhos estatísticos
-          ou de negócio.
+          preservam os mesmos guardrails. O diferencial esperado da orquestração está na recuperação
+          contextual, síntese e comunicação — não na propriedade exclusiva dos mecanismos de
+          segurança. No MVP, esse comportamento é representado por simulação controlada: não há
+          modelo de linguagem nem RAG vetorial conectado. Esta tela é uma matriz de capacidades, não
+          um benchmark executado, e não declara ganhos estatísticos ou de negócio.
         </p>
       </div>
 
@@ -137,10 +140,12 @@ function Evaluation() {
             <div className="col-span-4 text-sm text-foreground/80">{r.baseline}</div>
             <div className="col-span-4 text-sm text-foreground/80">{r.agent}</div>
             <div className="col-span-1 flex justify-end">
-              <span className={cn(
-                "inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-medium tracking-wide whitespace-nowrap",
-                verdictStyle[r.verdict],
-              )}>
+              <span
+                className={cn(
+                  "inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-medium tracking-wide whitespace-nowrap",
+                  verdictStyle[r.verdict],
+                )}
+              >
                 {r.verdict}
               </span>
             </div>

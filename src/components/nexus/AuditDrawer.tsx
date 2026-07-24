@@ -1,4 +1,10 @@
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+} from "@/components/ui/sheet";
 import { useNexus } from "@/lib/nexus-store";
 import { getExecutionConfig } from "@/lib/execution-config";
 import type { AuditEvent } from "@/lib/scenarios";
@@ -80,15 +86,34 @@ export function AuditDrawer() {
                     <div className="mt-1 space-y-0.5 text-xs text-muted-foreground">
                       {e.from && e.to && (
                         <div>
-                          <span className="font-mono">{e.from}</span> → <span className="font-mono">{e.to}</span>
+                          <span className="font-mono">{e.from}</span> →{" "}
+                          <span className="font-mono">{e.to}</span>
                         </div>
                       )}
-                      {!e.from && e.to && <div>estado: <span className="font-mono">{e.to}</span></div>}
-                      {e.rule && <div>regra: <span className="font-mono">{e.rule}</span></div>}
-                      {e.finding && <div>finding: <span className="font-mono">{e.finding}</span></div>}
-                      {e.version && <div>versão: <span className="font-mono">{e.version}</span></div>}
+                      {!e.from && e.to && (
+                        <div>
+                          estado: <span className="font-mono">{e.to}</span>
+                        </div>
+                      )}
+                      {e.rule && (
+                        <div>
+                          regra: <span className="font-mono">{e.rule}</span>
+                        </div>
+                      )}
+                      {e.finding && (
+                        <div>
+                          finding: <span className="font-mono">{e.finding}</span>
+                        </div>
+                      )}
+                      {e.version && (
+                        <div>
+                          versão: <span className="font-mono">{e.version}</span>
+                        </div>
+                      )}
                       {e.justification && (
-                        <div>justificativa: <span className="text-foreground">{e.justification}</span></div>
+                        <div>
+                          justificativa: <span className="text-foreground">{e.justification}</span>
+                        </div>
                       )}
                     </div>
                   </li>

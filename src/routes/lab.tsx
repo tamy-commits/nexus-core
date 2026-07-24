@@ -1,5 +1,12 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { ArrowRight, AlertTriangle, GitBranch, WifiOff, CheckCircle2, FlaskConical } from "lucide-react";
+import {
+  ArrowRight,
+  AlertTriangle,
+  GitBranch,
+  WifiOff,
+  CheckCircle2,
+  FlaskConical,
+} from "lucide-react";
 import { SCENARIOS, STATE_LABEL } from "@/lib/scenarios";
 import { useNexus } from "@/lib/nexus-store";
 import { StateBadge } from "@/components/nexus/Badges";
@@ -9,9 +16,15 @@ export const Route = createFileRoute("/lab")({
   head: () => ({
     meta: [
       { title: "Scenario Lab — NEXUS" },
-      { name: "description", content: "Ambiente demonstrativo com dados e respostas sintéticas controladas." },
+      {
+        name: "description",
+        content: "Ambiente demonstrativo com dados e respostas sintéticas controladas.",
+      },
       { property: "og:title", content: "Scenario Lab — NEXUS" },
-      { property: "og:description", content: "Ambiente demonstrativo com dados e respostas sintéticas controladas." },
+      {
+        property: "og:description",
+        content: "Ambiente demonstrativo com dados e respostas sintéticas controladas.",
+      },
       { property: "og:type", content: "website" },
     ],
   }),
@@ -49,8 +62,8 @@ function ScenarioLab() {
           Selecione um cenário para instanciar um caso
         </h2>
         <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-          Cada cenário carrega dados pré-configurados que reproduzem uma condição
-          representativa da operação de prontidão documental.
+          Cada cenário carrega dados pré-configurados que reproduzem uma condição representativa da
+          operação de prontidão documental.
         </p>
       </div>
 
@@ -78,10 +91,12 @@ function ScenarioLab() {
 
               <div className="flex items-start justify-between gap-4">
                 <div className="flex items-start gap-3">
-                  <div className={cn(
-                    "grid h-10 w-10 shrink-0 place-items-center rounded-lg",
-                    featured ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground",
-                  )}>
+                  <div
+                    className={cn(
+                      "grid h-10 w-10 shrink-0 place-items-center rounded-lg",
+                      featured ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground",
+                    )}
+                  >
                     <Icon className="h-5 w-5" strokeWidth={1.6} />
                   </div>
                   <div className="min-w-0">

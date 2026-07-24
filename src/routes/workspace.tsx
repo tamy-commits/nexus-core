@@ -1,9 +1,24 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Check, FileText, ShieldAlert, UserCog, ArrowRight, Sparkles, RefreshCw, ScrollText } from "lucide-react";
+import {
+  Check,
+  FileText,
+  ShieldAlert,
+  UserCog,
+  ArrowRight,
+  Sparkles,
+  RefreshCw,
+  ScrollText,
+} from "lucide-react";
 import { useNexus } from "@/lib/nexus-store";
 import { STEPS, STATE_LABEL, TECH_LABEL } from "@/lib/scenarios";
 import { Button } from "@/components/ui/button";
-import { DocStatusBadge, PolicyBadge, NeutralBadge, StateBadge, TechBadge } from "@/components/nexus/Badges";
+import {
+  DocStatusBadge,
+  PolicyBadge,
+  NeutralBadge,
+  StateBadge,
+  TechBadge,
+} from "@/components/nexus/Badges";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/workspace")({
@@ -12,7 +27,10 @@ export const Route = createFileRoute("/workspace")({
       { title: "Case Workspace — NEXUS" },
       { name: "description", content: "Área de trabalho de caso de prontidão documental." },
       { property: "og:title", content: "Case Workspace — NEXUS" },
-      { property: "og:description", content: "Contexto, política, documentos e trilha de decisão em um só lugar." },
+      {
+        property: "og:description",
+        content: "Contexto, política, documentos e trilha de decisão em um só lugar.",
+      },
     ],
   }),
   component: Workspace,
@@ -56,12 +74,13 @@ function Workspace() {
             <div className="text-[11px] uppercase tracking-wider text-muted-foreground">
               {scenario.client}
             </div>
-            <h2 className="text-lg font-semibold text-foreground">
-              {scenario.requestType}
-            </h2>
+            <h2 className="text-lg font-semibold text-foreground">{scenario.requestType}</h2>
           </div>
           <div className="text-right text-xs text-muted-foreground">
-            <div>Segmento <span className="text-foreground font-medium">{scenario.segment}</span> · Canal <span className="text-foreground font-medium">{scenario.channel}</span></div>
+            <div>
+              Segmento <span className="text-foreground font-medium">{scenario.segment}</span> ·
+              Canal <span className="text-foreground font-medium">{scenario.channel}</span>
+            </div>
             <div className="font-mono mt-0.5">{scenario.caseId}</div>
           </div>
         </div>
@@ -72,25 +91,31 @@ function Workspace() {
             const current = i === currentStepIndex;
             return (
               <li key={step} className="flex flex-1 items-center gap-2 min-w-0">
-                <div className={cn(
-                  "grid h-6 w-6 shrink-0 place-items-center rounded-full text-[11px] font-semibold transition-colors",
-                  done && "bg-success text-success-foreground",
-                  current && "bg-primary text-primary-foreground ring-4 ring-primary/15",
-                  !done && !current && "bg-muted text-muted-foreground",
-                )}>
+                <div
+                  className={cn(
+                    "grid h-6 w-6 shrink-0 place-items-center rounded-full text-[11px] font-semibold transition-colors",
+                    done && "bg-success text-success-foreground",
+                    current && "bg-primary text-primary-foreground ring-4 ring-primary/15",
+                    !done && !current && "bg-muted text-muted-foreground",
+                  )}
+                >
                   {done ? <Check className="h-3 w-3" /> : i + 1}
                 </div>
-                <span className={cn(
-                  "text-xs truncate transition-colors",
-                  current ? "font-semibold text-foreground" : "text-muted-foreground",
-                )}>
+                <span
+                  className={cn(
+                    "text-xs truncate transition-colors",
+                    current ? "font-semibold text-foreground" : "text-muted-foreground",
+                  )}
+                >
                   {step}
                 </span>
                 {i < STEPS.length - 1 && (
-                  <div className={cn(
-                    "h-px flex-1 transition-colors",
-                    done ? "bg-success/50" : "bg-border",
-                  )} />
+                  <div
+                    className={cn(
+                      "h-px flex-1 transition-colors",
+                      done ? "bg-success/50" : "bg-border",
+                    )}
+                  />
                 )}
               </li>
             );
@@ -123,15 +148,22 @@ function Workspace() {
                 <div key={p.code} className="rounded-lg border border-border bg-background/60 p-4">
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
-                      <div className="font-mono text-xs text-muted-foreground">{p.code} · v{p.version}</div>
+                      <div className="font-mono text-xs text-muted-foreground">
+                        {p.code} · v{p.version}
+                      </div>
                       <div className="mt-0.5 text-sm font-medium text-foreground">{p.title}</div>
-                      <div className="mt-0.5 text-xs text-muted-foreground">Vigência {p.validity}</div>
+                      <div className="mt-0.5 text-xs text-muted-foreground">
+                        Vigência {p.validity}
+                      </div>
                     </div>
                     <PolicyBadge badge={p.badge} />
                   </div>
                   <ul className="mt-3 space-y-1.5">
                     {p.excerpts.map((e, i) => (
-                      <li key={i} className="border-l-2 border-primary/30 pl-3 text-xs italic text-foreground/75">
+                      <li
+                        key={i}
+                        className="border-l-2 border-primary/30 pl-3 text-xs italic text-foreground/75"
+                      >
                         {e}
                       </li>
                     ))}
@@ -190,8 +222,16 @@ function Workspace() {
                         <div className="mt-2 rounded-md border border-warning/30 bg-warning/8 px-3 py-2 text-xs">
                           <div className="text-warning-foreground font-medium">{d.finding}</div>
                           <div className="mt-0.5 text-muted-foreground">
-                            {d.reasonCode && <><span className="font-mono">{d.reasonCode}</span> · </>}
-                            {d.rule && <>Regra <span className="font-mono">{d.rule}</span></>}
+                            {d.reasonCode && (
+                              <>
+                                <span className="font-mono">{d.reasonCode}</span> ·{" "}
+                              </>
+                            )}
+                            {d.rule && (
+                              <>
+                                Regra <span className="font-mono">{d.rule}</span>
+                              </>
+                            )}
                           </div>
                         </div>
                       )}
@@ -224,37 +264,57 @@ function Workspace() {
             <dl className="mt-3 space-y-2.5 text-xs">
               <div className="flex items-center justify-between gap-2">
                 <dt className="text-muted-foreground">Estado inicial</dt>
-                <dd><StateBadge state={scenario.initialState} label={STATE_LABEL[scenario.initialState]} /></dd>
+                <dd>
+                  <StateBadge
+                    state={scenario.initialState}
+                    label={STATE_LABEL[scenario.initialState]}
+                  />
+                </dd>
               </div>
               <div className="flex items-center justify-between gap-2">
                 <dt className="text-muted-foreground">Estado atual</dt>
-                <dd><StateBadge state={scenario.currentState} label={STATE_LABEL[scenario.currentState]} /></dd>
+                <dd>
+                  <StateBadge
+                    state={scenario.currentState}
+                    label={STATE_LABEL[scenario.currentState]}
+                  />
+                </dd>
               </div>
               <div className="flex items-center justify-between gap-2">
                 <dt className="text-muted-foreground">Transição proposta</dt>
-                <dd><StateBadge state={scenario.nextState} label={STATE_LABEL[scenario.nextState]} /></dd>
+                <dd>
+                  <StateBadge state={scenario.nextState} label={STATE_LABEL[scenario.nextState]} />
+                </dd>
               </div>
               <div className="flex items-center justify-between gap-2">
                 <dt className="text-muted-foreground">Condição técnica</dt>
-                <dd><TechBadge tech={scenario.tech} label={TECH_LABEL[scenario.tech]} /></dd>
+                <dd>
+                  <TechBadge tech={scenario.tech} label={TECH_LABEL[scenario.tech]} />
+                </dd>
               </div>
             </dl>
 
             <div className="mt-4">
-              <div className="text-[11px] uppercase tracking-wider text-muted-foreground">Findings ativos</div>
+              <div className="text-[11px] uppercase tracking-wider text-muted-foreground">
+                Findings ativos
+              </div>
               {scenario.findings.length === 0 ? (
                 <div className="mt-1 text-xs text-muted-foreground">Nenhum finding ativo.</div>
               ) : (
                 <ul className="mt-1 space-y-1">
                   {scenario.findings.map((f, i) => (
-                    <li key={i} className="text-xs text-foreground">• {f}</li>
+                    <li key={i} className="text-xs text-foreground">
+                      • {f}
+                    </li>
                   ))}
                 </ul>
               )}
             </div>
 
             <div className="mt-4">
-              <div className="text-[11px] uppercase tracking-wider text-muted-foreground">Regras executadas</div>
+              <div className="text-[11px] uppercase tracking-wider text-muted-foreground">
+                Regras executadas
+              </div>
               <div className="mt-1.5 flex flex-wrap gap-1">
                 {scenario.rulesExecuted.map((r) => (
                   <NeutralBadge key={r}>{r}</NeutralBadge>
@@ -281,13 +341,17 @@ function Workspace() {
               </div>
             </div>
 
-            <div className={cn(
-              "mt-4 rounded-md border p-3",
-              scenario.groundingStatus === "ok"
-                ? "border-border bg-muted/30"
-                : "border-warning/35 bg-warning/10",
-            )}>
-              <div className="text-[11px] uppercase tracking-wider text-muted-foreground">Grounding</div>
+            <div
+              className={cn(
+                "mt-4 rounded-md border p-3",
+                scenario.groundingStatus === "ok"
+                  ? "border-border bg-muted/30"
+                  : "border-warning/35 bg-warning/10",
+              )}
+            >
+              <div className="text-[11px] uppercase tracking-wider text-muted-foreground">
+                Grounding
+              </div>
               <p className="mt-1 text-xs text-foreground">
                 {scenario.groundingStatus === "insuficiente"
                   ? "Sem evidência suficiente — decisão automática bloqueada."
@@ -321,11 +385,7 @@ function Workspace() {
           )}
 
           {showReview && (
-            <Button
-              variant="outline"
-              className="w-full gap-2"
-              onClick={() => setReviewOpen(true)}
-            >
+            <Button variant="outline" className="w-full gap-2" onClick={() => setReviewOpen(true)}>
               <UserCog className="h-4 w-4" />
               Abrir revisão humana
             </Button>
@@ -340,7 +400,9 @@ function Row({ label, value, mono }: { label: string; value: string; mono?: bool
   return (
     <div className="flex items-baseline justify-between gap-3">
       <dt className="text-xs text-muted-foreground shrink-0">{label}</dt>
-      <dd className={cn("text-right text-sm text-foreground truncate", mono && "font-mono text-xs")}>
+      <dd
+        className={cn("text-right text-sm text-foreground truncate", mono && "font-mono text-xs")}
+      >
         {value}
       </dd>
     </div>

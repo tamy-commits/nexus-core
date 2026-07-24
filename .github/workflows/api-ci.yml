@@ -9,6 +9,12 @@ on:
       - "requirements.txt"
       - "Dockerfile.api"
       - "render.yaml"
+      - "src/**"
+      - "package.json"
+      - "bun.lock"
+      - "vite.config.ts"
+      - "tsconfig.json"
+      - "eslint.config.js"
       - ".github/workflows/api-ci.yml"
   push:
     branches: [main]
@@ -19,6 +25,12 @@ on:
       - "requirements.txt"
       - "Dockerfile.api"
       - "render.yaml"
+      - "src/**"
+      - "package.json"
+      - "bun.lock"
+      - "vite.config.ts"
+      - "tsconfig.json"
+      - "eslint.config.js"
       - ".github/workflows/api-ci.yml"
 
 permissions:
@@ -43,3 +55,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: docker build --file Dockerfile.api --tag nexus-api:ci .
+
+  lint-and-build-frontend:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v1
+      - run: bun install
+      - run: bun run lint
+      - run: bun run build
