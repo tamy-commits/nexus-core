@@ -21,10 +21,7 @@ const communicationByScenario: Record<Scenario["key"], string> = {
   D: "COM-READY v1.0",
 };
 
-export function getExecutionConfig(
-  caseId: string,
-  scenarioKey: Scenario["key"],
-): ExecutionConfig {
+export function getExecutionConfig(caseId: string, scenarioKey: Scenario["key"]): ExecutionConfig {
   const caseSuffix = caseId.replace("NXS-2026-", "");
 
   return {

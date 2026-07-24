@@ -1,4 +1,10 @@
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+} from "@/components/ui/sheet";
 import { useNexus } from "@/lib/nexus-store";
 
 export function EvidenceDrawer() {
@@ -39,7 +45,9 @@ export function EvidenceDrawer() {
                     </>
                   )}
                   <dt className="text-muted-foreground">Política</dt>
-                  <dd className="col-span-2 font-mono text-foreground">{e.policyCode} · v{e.policyVersion}</dd>
+                  <dd className="col-span-2 font-mono text-foreground">
+                    {e.policyCode} · v{e.policyVersion}
+                  </dd>
                   <dt className="text-muted-foreground">Vigência</dt>
                   <dd className="col-span-2 text-foreground">{e.policyValidity}</dd>
                   <dt className="text-muted-foreground">Registrado</dt>

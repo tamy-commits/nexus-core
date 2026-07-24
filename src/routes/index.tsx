@@ -19,9 +19,15 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "Central de Prontidão Documental — NEXUS" },
-      { name: "description", content: "Acompanhamento de solicitações, pendências, revisões e prontidão para submissão." },
+      {
+        name: "description",
+        content: "Acompanhamento de solicitações, pendências, revisões e prontidão para submissão.",
+      },
       { property: "og:title", content: "Central de Prontidão Documental — NEXUS" },
-      { property: "og:description", content: "Acompanhamento de solicitações, pendências, revisões e prontidão para submissão." },
+      {
+        property: "og:description",
+        content: "Acompanhamento de solicitações, pendências, revisões e prontidão para submissão.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -43,7 +49,8 @@ function CaseCenter() {
       revisao: cases.filter((c) => c.currentState === "EM_REVISAO_HUMANA").length,
       bloqueadoTec: cases.filter((c) => c.tech === "BLOQUEADO_TECNICO").length,
       prontas: cases.filter(
-        (c) => c.currentState === "PRONTA_PARA_SUBMISSAO" || c.currentState === "EM_VALIDACAO_SOMBRA",
+        (c) =>
+          c.currentState === "PRONTA_PARA_SUBMISSAO" || c.currentState === "EM_VALIDACAO_SOMBRA",
       ).length,
     };
   }, [cases]);
@@ -53,7 +60,8 @@ function CaseCenter() {
     return cases.filter((c) => {
       if (stateFilter !== "ALL" && c.currentState !== stateFilter) return false;
       if (techFilter !== "ALL" && c.tech !== techFilter) return false;
-      if (term && !c.caseId.toLowerCase().includes(term) && !c.client.toLowerCase().includes(term)) return false;
+      if (term && !c.caseId.toLowerCase().includes(term) && !c.client.toLowerCase().includes(term))
+        return false;
       return true;
     });
   }, [cases, q, stateFilter, techFilter]);
@@ -82,7 +90,11 @@ function CaseCenter() {
         <Indicator label="Total de casos" value={indicators.total} />
         <Indicator label="Aguardando correção" value={indicators.aguardando} tone="warning" />
         <Indicator label="Em revisão humana" value={indicators.revisao} tone="info" />
-        <Indicator label="Bloqueados tecnicamente" value={indicators.bloqueadoTec} tone="destructive" />
+        <Indicator
+          label="Bloqueados tecnicamente"
+          value={indicators.bloqueadoTec}
+          tone="destructive"
+        />
         <Indicator label="Prontos p/ submissão" value={indicators.prontas} tone="success" />
       </div>
 
@@ -97,14 +109,19 @@ function CaseCenter() {
             className="pl-8"
           />
         </div>
-        <Select value={stateFilter} onValueChange={(v) => setStateFilter(v as ProcessState | "ALL")}>
+        <Select
+          value={stateFilter}
+          onValueChange={(v) => setStateFilter(v as ProcessState | "ALL")}
+        >
           <SelectTrigger className="w-[220px]">
             <SelectValue placeholder="Estado do processo" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="ALL">Todos os estados</SelectItem>
             {(Object.keys(STATE_LABEL) as ProcessState[]).map((s) => (
-              <SelectItem key={s} value={s}>{STATE_LABEL[s]}</SelectItem>
+              <SelectItem key={s} value={s}>
+                {STATE_LABEL[s]}
+              </SelectItem>
             ))}
           </SelectContent>
         </Select>
@@ -115,7 +132,9 @@ function CaseCenter() {
           <SelectContent>
             <SelectItem value="ALL">Todas as condições</SelectItem>
             {(Object.keys(TECH_LABEL) as TechCondition[]).map((t) => (
-              <SelectItem key={t} value={t}>{TECH_LABEL[t]}</SelectItem>
+              <SelectItem key={t} value={t}>
+                {TECH_LABEL[t]}
+              </SelectItem>
             ))}
           </SelectContent>
         </Select>
@@ -151,8 +170,12 @@ function CaseCenter() {
               </div>
               <div className="text-sm text-foreground truncate">{c.client}</div>
               <div className="text-sm text-foreground/80">{c.currentStep}</div>
-              <div><StateBadge state={c.currentState} label={STATE_LABEL[c.currentState]} /></div>
-              <div><TechBadge tech={c.tech} label={TECH_LABEL[c.tech]} /></div>
+              <div>
+                <StateBadge state={c.currentState} label={STATE_LABEL[c.currentState]} />
+              </div>
+              <div>
+                <TechBadge tech={c.tech} label={TECH_LABEL[c.tech]} />
+              </div>
               <div className="font-mono text-xs text-muted-foreground">{c.lastUpdate}</div>
               <div className="md:text-right">
                 <Button size="sm" variant="outline" className="gap-1.5" onClick={() => open(c.key)}>

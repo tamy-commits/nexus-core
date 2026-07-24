@@ -1,5 +1,11 @@
 import { useEffect, useState } from "react";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+} from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
@@ -30,17 +36,18 @@ export function HumanReviewDrawer() {
     toast.success("Decisão de revisão registrada na trilha de auditoria.");
   };
 
-  const options = scenario?.key === "B"
-    ? [
-        "Aplicar POL-DOC-PJ-02 com exceção justificada",
-        "Aplicar POL-KYC-PJ-04 (exigência reforçada)",
-        "Encaminhar para instância superior",
-      ]
-    : [
-        "Ratificar encaminhamento para validação em sombra",
-        "Solicitar ajuste antes do handoff",
-        "Encaminhar para instância superior",
-      ];
+  const options =
+    scenario?.key === "B"
+      ? [
+          "Aplicar POL-DOC-PJ-02 com exceção justificada",
+          "Aplicar POL-KYC-PJ-04 (exigência reforçada)",
+          "Encaminhar para instância superior",
+        ]
+      : [
+          "Ratificar encaminhamento para validação em sombra",
+          "Solicitar ajuste antes do handoff",
+          "Encaminhar para instância superior",
+        ];
 
   return (
     <Sheet open={reviewOpen} onOpenChange={setReviewOpen}>
@@ -64,19 +71,25 @@ export function HumanReviewDrawer() {
               </section>
 
               <section>
-                <h4 className="text-xs uppercase tracking-wide text-muted-foreground">Recomendação do agente</h4>
+                <h4 className="text-xs uppercase tracking-wide text-muted-foreground">
+                  Recomendação do agente
+                </h4>
                 <p className="mt-1 text-sm text-foreground">
                   {scenario.humanReview?.recommendation ?? scenario.recommendation}
                 </p>
               </section>
 
               <section>
-                <h4 className="text-xs uppercase tracking-wide text-muted-foreground">Políticas envolvidas</h4>
+                <h4 className="text-xs uppercase tracking-wide text-muted-foreground">
+                  Políticas envolvidas
+                </h4>
                 <ul className="mt-2 space-y-2">
                   {scenario.policies.map((p) => (
                     <li key={p.code} className="rounded-md border border-border bg-card p-3">
                       <div className="flex items-center justify-between gap-2">
-                        <span className="font-mono text-xs">{p.code} · v{p.version}</span>
+                        <span className="font-mono text-xs">
+                          {p.code} · v{p.version}
+                        </span>
                         <PolicyBadge badge={p.badge} />
                       </div>
                       <p className="mt-1 text-xs text-muted-foreground">{p.title}</p>
@@ -90,18 +103,27 @@ export function HumanReviewDrawer() {
                   <Label className="text-xs uppercase tracking-wide text-muted-foreground">
                     Decisão
                   </Label>
-                  <RadioGroup value={decision} onValueChange={setDecision} className="mt-2 space-y-1.5">
+                  <RadioGroup
+                    value={decision}
+                    onValueChange={setDecision}
+                    className="mt-2 space-y-1.5"
+                  >
                     {options.map((opt, i) => (
                       <div key={opt} className="flex items-center gap-2">
                         <RadioGroupItem value={opt} id={`d${i}`} />
-                        <Label htmlFor={`d${i}`} className="text-sm font-normal">{opt}</Label>
+                        <Label htmlFor={`d${i}`} className="text-sm font-normal">
+                          {opt}
+                        </Label>
                       </div>
                     ))}
                   </RadioGroup>
                 </div>
 
                 <div>
-                  <Label htmlFor="actor" className="text-xs uppercase tracking-wide text-muted-foreground">
+                  <Label
+                    htmlFor="actor"
+                    className="text-xs uppercase tracking-wide text-muted-foreground"
+                  >
                     Responsável / papel <span className="text-destructive">*</span>
                   </Label>
                   <Input
@@ -114,7 +136,10 @@ export function HumanReviewDrawer() {
                 </div>
 
                 <div>
-                  <Label htmlFor="just" className="text-xs uppercase tracking-wide text-muted-foreground">
+                  <Label
+                    htmlFor="just"
+                    className="text-xs uppercase tracking-wide text-muted-foreground"
+                  >
                     Justificativa <span className="text-destructive">*</span>
                   </Label>
                   <Textarea
@@ -137,14 +162,27 @@ export function HumanReviewDrawer() {
               </section>
 
               <section>
-                <h4 className="text-xs uppercase tracking-wide text-muted-foreground">Decisão adjudicada</h4>
+                <h4 className="text-xs uppercase tracking-wide text-muted-foreground">
+                  Decisão adjudicada
+                </h4>
                 <div className="mt-1 min-h-10 rounded-md border border-dashed border-border bg-muted/40 p-3 text-sm text-foreground">
                   {humanReviewRecord ? (
                     <div className="space-y-1">
-                      <div><span className="text-muted-foreground text-xs">Decisão:</span> {humanReviewRecord.decision}</div>
-                      <div><span className="text-muted-foreground text-xs">Responsável:</span> {humanReviewRecord.actor}</div>
-                      <div><span className="text-muted-foreground text-xs">Registrada às</span> <span className="font-mono">{humanReviewRecord.time}</span></div>
-                      <div className="mt-1 text-xs italic text-foreground/80">"{humanReviewRecord.justification}"</div>
+                      <div>
+                        <span className="text-muted-foreground text-xs">Decisão:</span>{" "}
+                        {humanReviewRecord.decision}
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground text-xs">Responsável:</span>{" "}
+                        {humanReviewRecord.actor}
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground text-xs">Registrada às</span>{" "}
+                        <span className="font-mono">{humanReviewRecord.time}</span>
+                      </div>
+                      <div className="mt-1 text-xs italic text-foreground/80">
+                        "{humanReviewRecord.justification}"
+                      </div>
                     </div>
                   ) : (
                     <span className="text-muted-foreground">Aguardando registro.</span>

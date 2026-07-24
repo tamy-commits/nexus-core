@@ -170,16 +170,18 @@ export function NexusProvider({ children }: { children: ReactNode }) {
         ];
       }
       next.audit.push(
-        ...result.audit.map((event, index): AuditEvent => ({
-          id: `${result.run_id}-${index}`,
-          time: now(),
-          actor: event.actor,
-          action: event.action,
-          rule: event.rule,
-          finding: event.finding,
-          from: event.from_state,
-          to: event.to_state,
-        })),
+        ...result.audit.map(
+          (event, index): AuditEvent => ({
+            id: `${result.run_id}-${index}`,
+            time: now(),
+            actor: event.actor,
+            action: event.action,
+            rule: event.rule,
+            finding: event.finding,
+            from: event.from_state,
+            to: event.to_state,
+          }),
+        ),
       );
       setExecutionMode(result.mode);
       setLastRunId(result.run_id);

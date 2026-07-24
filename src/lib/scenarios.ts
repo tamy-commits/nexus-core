@@ -11,13 +11,7 @@ export type ProcessState =
 
 export type TechCondition = "NORMAL" | "AGUARDANDO_RETRY" | "BLOQUEADO_TECNICO";
 
-export type StepKey =
-  | "Contexto"
-  | "Política"
-  | "Documentos"
-  | "Decisão"
-  | "Revisão"
-  | "Handoff";
+export type StepKey = "Contexto" | "Política" | "Documentos" | "Decisão" | "Revisão" | "Handoff";
 
 export const STEPS: StepKey[] = [
   "Contexto",
@@ -140,8 +134,7 @@ export const SCENARIOS: Scenario[] = [
     featured: true,
     category: "Correção documental",
     title: "Correção documental",
-    short:
-      "Cliente com documentação quase pronta, exceto por um comprovante de endereço vencido.",
+    short: "Cliente com documentação quase pronta, exceto por um comprovante de endereço vencido.",
     risk: "Submissão bloqueada por documento fora de validade.",
     initialState: "AGUARDANDO_CORRECAO",
     currentState: "AGUARDANDO_CORRECAO",
@@ -157,8 +150,20 @@ export const SCENARIOS: Scenario[] = [
     currentStep: "Documentos",
     policies: [basePolicyDoc],
     documents: [
-      { id: "contrato", label: "Contrato social", file: "contrato_social_v2.pdf", version: 2, status: "Atendido" },
-      { id: "repr", label: "Documento dos representantes", file: "documentos_representantes.zip", version: 1, status: "Atendido" },
+      {
+        id: "contrato",
+        label: "Contrato social",
+        file: "contrato_social_v2.pdf",
+        version: 2,
+        status: "Atendido",
+      },
+      {
+        id: "repr",
+        label: "Documento dos representantes",
+        file: "documentos_representantes.zip",
+        version: 1,
+        status: "Atendido",
+      },
       {
         id: "endereco",
         label: "Comprovante de endereço",
@@ -172,13 +177,24 @@ export const SCENARIOS: Scenario[] = [
         action: "Simular envio de nova versão",
         highlight: true,
       },
-      { id: "form", label: "Formulário de abertura", file: "formulario_abertura.pdf", version: 1, status: "Atendido" },
-      { id: "poderes", label: "Evidência de poderes de representação", file: "procuracao_v1.pdf", version: 1, status: "Atendido" },
+      {
+        id: "form",
+        label: "Formulário de abertura",
+        file: "formulario_abertura.pdf",
+        version: 1,
+        status: "Atendido",
+      },
+      {
+        id: "poderes",
+        label: "Evidência de poderes de representação",
+        file: "procuracao_v1.pdf",
+        version: 1,
+        status: "Atendido",
+      },
     ],
     findings: ["DOC_VENCIDO — Comprovante de endereço fora da janela de 90 dias."],
     rulesExecuted: ["R-DOC-01", "R-DOC-04", "R-KYC-02"],
-    recommendation:
-      "Solicitar reenvio do comprovante de endereço com emissão recente.",
+    recommendation: "Solicitar reenvio do comprovante de endereço com emissão recente.",
     authorizedAction: "Aguardar nova versão do documento antes da submissão.",
     grounding: "Finding fundamentado em POL-DOC-PJ-02 v3.1, cláusula de validade de 90 dias.",
     groundingStatus: "ok",
@@ -191,23 +207,42 @@ export const SCENARIOS: Scenario[] = [
         policyCode: "POL-DOC-PJ-02",
         policyVersion: "3.1",
         policyValidity: "01/07/2026 a 31/12/2026",
-        excerpt: "Comprovante de endereço deve ter emissão inferior a 90 dias na data da submissão.",
+        excerpt:
+          "Comprovante de endereço deve ter emissão inferior a 90 dias na data da submissão.",
         timestamp: "09:13",
       },
     ],
     lastUpdate: "09:13",
     audit: [
-      { id: "a1", time: "09:12", actor: "Agente", action: "Caso instanciado", to: "AGUARDANDO_CORRECAO" },
-      { id: "a2", time: "09:12", actor: "Regra", action: "Recuperação de política", rule: "POL-DOC-PJ-02 v3.1" },
-      { id: "a3", time: "09:13", actor: "Regra", action: "Validação de documentos", rule: "R-DOC-04", finding: "DOC_VENCIDO" },
+      {
+        id: "a1",
+        time: "09:12",
+        actor: "Agente",
+        action: "Caso instanciado",
+        to: "AGUARDANDO_CORRECAO",
+      },
+      {
+        id: "a2",
+        time: "09:12",
+        actor: "Regra",
+        action: "Recuperação de política",
+        rule: "POL-DOC-PJ-02 v3.1",
+      },
+      {
+        id: "a3",
+        time: "09:13",
+        actor: "Regra",
+        action: "Validação de documentos",
+        rule: "R-DOC-04",
+        finding: "DOC_VENCIDO",
+      },
     ],
   },
   {
     key: "B",
     category: "Política conflitante",
     title: "Política conflitante",
-    short:
-      "Duas políticas recuperadas apresentam exigências divergentes para o mesmo caso.",
+    short: "Duas políticas recuperadas apresentam exigências divergentes para o mesmo caso.",
     risk: "Decisão automática inviável sem arbitragem humana.",
     initialState: "EM_PREPARACAO",
     currentState: "EM_PREPARACAO",
@@ -236,11 +271,43 @@ export const SCENARIOS: Scenario[] = [
       },
     ],
     documents: [
-      { id: "contrato", label: "Contrato social", file: "contrato_social_v3.pdf", version: 3, status: "Atendido" },
-      { id: "repr", label: "Documento dos representantes", file: "docs_repr.zip", version: 1, status: "Atendido" },
-      { id: "endereco", label: "Comprovante de endereço", file: "comprovante_endereco_v1.pdf", version: 1, validity: "10/07/2026", status: "Atendido" },
-      { id: "form", label: "Formulário de abertura", file: "formulario_abertura.pdf", version: 1, status: "Atendido" },
-      { id: "poderes", label: "Evidência de poderes de representação", file: "procuracao_v2.pdf", version: 2, status: "Pendente", finding: "Verificação presencial pendente." },
+      {
+        id: "contrato",
+        label: "Contrato social",
+        file: "contrato_social_v3.pdf",
+        version: 3,
+        status: "Atendido",
+      },
+      {
+        id: "repr",
+        label: "Documento dos representantes",
+        file: "docs_repr.zip",
+        version: 1,
+        status: "Atendido",
+      },
+      {
+        id: "endereco",
+        label: "Comprovante de endereço",
+        file: "comprovante_endereco_v1.pdf",
+        version: 1,
+        validity: "10/07/2026",
+        status: "Atendido",
+      },
+      {
+        id: "form",
+        label: "Formulário de abertura",
+        file: "formulario_abertura.pdf",
+        version: 1,
+        status: "Atendido",
+      },
+      {
+        id: "poderes",
+        label: "Evidência de poderes de representação",
+        file: "procuracao_v2.pdf",
+        version: 2,
+        status: "Pendente",
+        finding: "Verificação presencial pendente.",
+      },
     ],
     findings: [
       "POL_CONFLITO — POL-DOC-PJ-02 e POL-KYC-PJ-04 divergem sobre verificação presencial.",
@@ -260,7 +327,8 @@ export const SCENARIOS: Scenario[] = [
         policyCode: "POL-DOC-PJ-02",
         policyVersion: "3.1",
         policyValidity: "01/07/2026 a 31/12/2026",
-        excerpt: "Contrato social consolidado é obrigatório e deve refletir a composição societária vigente.",
+        excerpt:
+          "Contrato social consolidado é obrigatório e deve refletir a composição societária vigente.",
         timestamp: "10:05",
       },
       {
@@ -283,16 +351,28 @@ export const SCENARIOS: Scenario[] = [
     },
     audit: [
       { id: "b1", time: "10:04", actor: "Agente", action: "Caso instanciado", to: "EM_PREPARACAO" },
-      { id: "b2", time: "10:04", actor: "Regra", action: "Recuperação de políticas", rule: "POL-DOC-PJ-02 v3.1 + POL-KYC-PJ-04 v2.2" },
-      { id: "b3", time: "10:05", actor: "Regra", action: "Detecção de conflito", rule: "R-POL-07", finding: "POL_CONFLITO" },
+      {
+        id: "b2",
+        time: "10:04",
+        actor: "Regra",
+        action: "Recuperação de políticas",
+        rule: "POL-DOC-PJ-02 v3.1 + POL-KYC-PJ-04 v2.2",
+      },
+      {
+        id: "b3",
+        time: "10:05",
+        actor: "Regra",
+        action: "Detecção de conflito",
+        rule: "R-POL-07",
+        finding: "POL_CONFLITO",
+      },
     ],
   },
   {
     key: "C",
     category: "Falha de integração",
     title: "Falha de integração",
-    short:
-      "Consulta simulada a serviço externo excedeu o tempo previsto e aguarda retry.",
+    short: "Consulta simulada a serviço externo excedeu o tempo previsto e aguarda retry.",
     risk: "Caso não pode ser considerado pronto sob condição técnica degradada.",
     initialState: "EM_PREPARACAO",
     currentState: "EM_PREPARACAO",
@@ -308,16 +388,46 @@ export const SCENARIOS: Scenario[] = [
     currentStep: "Decisão",
     policies: [basePolicyDoc],
     documents: [
-      { id: "contrato", label: "Contrato social", file: "contrato_social_v1.pdf", version: 1, status: "Atendido" },
-      { id: "repr", label: "Documento dos representantes", file: "docs_repr.zip", version: 1, status: "Atendido" },
-      { id: "endereco", label: "Comprovante de endereço", file: "comprovante_endereco_v1.pdf", version: 1, validity: "20/07/2026", status: "Atendido" },
-      { id: "form", label: "Formulário de abertura", file: "formulario_abertura.pdf", version: 1, status: "Atendido" },
-      { id: "poderes", label: "Evidência de poderes de representação", file: "procuracao_v1.pdf", version: 1, status: "Atendido" },
+      {
+        id: "contrato",
+        label: "Contrato social",
+        file: "contrato_social_v1.pdf",
+        version: 1,
+        status: "Atendido",
+      },
+      {
+        id: "repr",
+        label: "Documento dos representantes",
+        file: "docs_repr.zip",
+        version: 1,
+        status: "Atendido",
+      },
+      {
+        id: "endereco",
+        label: "Comprovante de endereço",
+        file: "comprovante_endereco_v1.pdf",
+        version: 1,
+        validity: "20/07/2026",
+        status: "Atendido",
+      },
+      {
+        id: "form",
+        label: "Formulário de abertura",
+        file: "formulario_abertura.pdf",
+        version: 1,
+        status: "Atendido",
+      },
+      {
+        id: "poderes",
+        label: "Evidência de poderes de representação",
+        file: "procuracao_v1.pdf",
+        version: 1,
+        status: "Atendido",
+      },
     ],
     findings: ["INT_TIMEOUT — Timeout na consulta simulada ao serviço de dados cadastrais."],
     rulesExecuted: ["R-INT-01", "R-INT-03"],
-    recommendation:
-      "Executar retry controlado; não classificar como pronto até estabilização.",
+    recommendation: "Executar retry controlado; não classificar como pronto até estabilização.",
     authorizedAction: "Aguardar retry — decisão suspensa. Timeout nunca é tratado como aprovação.",
     grounding: "Recomendação restrita ao domínio técnico; sem sobrescrita de política.",
     groundingStatus: "ok",
@@ -330,15 +440,28 @@ export const SCENARIOS: Scenario[] = [
         policyCode: "POL-INT-OPS-01",
         policyVersion: "1.4",
         policyValidity: "01/01/2026 a 31/12/2026",
-        excerpt: "Falhas técnicas não devem alterar o estado de negócio; classificar condição técnica separadamente.",
+        excerpt:
+          "Falhas técnicas não devem alterar o estado de negócio; classificar condição técnica separadamente.",
         timestamp: "11:21",
       },
     ],
     lastUpdate: "11:21",
     audit: [
       { id: "c1", time: "11:20", actor: "Agente", action: "Caso instanciado", to: "EM_PREPARACAO" },
-      { id: "c2", time: "11:21", actor: "Sistema", action: "Consulta externa", finding: "INT_TIMEOUT" },
-      { id: "c3", time: "11:21", actor: "Regra", action: "Marcada condição técnica AGUARDANDO_RETRY", rule: "R-INT-03" },
+      {
+        id: "c2",
+        time: "11:21",
+        actor: "Sistema",
+        action: "Consulta externa",
+        finding: "INT_TIMEOUT",
+      },
+      {
+        id: "c3",
+        time: "11:21",
+        actor: "Regra",
+        action: "Marcada condição técnica AGUARDANDO_RETRY",
+        rule: "R-INT-03",
+      },
     ],
   },
   {
@@ -361,17 +484,49 @@ export const SCENARIOS: Scenario[] = [
     currentStep: "Revisão",
     policies: [basePolicyDoc],
     documents: [
-      { id: "contrato", label: "Contrato social", file: "contrato_social_v4.pdf", version: 4, status: "Atendido" },
-      { id: "repr", label: "Documento dos representantes", file: "docs_repr.zip", version: 2, status: "Atendido" },
-      { id: "endereco", label: "Comprovante de endereço", file: "comprovante_endereco_v2.pdf", version: 2, validity: "12/09/2026", status: "Atendido" },
-      { id: "form", label: "Formulário de abertura", file: "formulario_abertura.pdf", version: 1, status: "Atendido" },
-      { id: "poderes", label: "Evidência de poderes de representação", file: "procuracao_v1.pdf", version: 1, status: "Atendido" },
+      {
+        id: "contrato",
+        label: "Contrato social",
+        file: "contrato_social_v4.pdf",
+        version: 4,
+        status: "Atendido",
+      },
+      {
+        id: "repr",
+        label: "Documento dos representantes",
+        file: "docs_repr.zip",
+        version: 2,
+        status: "Atendido",
+      },
+      {
+        id: "endereco",
+        label: "Comprovante de endereço",
+        file: "comprovante_endereco_v2.pdf",
+        version: 2,
+        validity: "12/09/2026",
+        status: "Atendido",
+      },
+      {
+        id: "form",
+        label: "Formulário de abertura",
+        file: "formulario_abertura.pdf",
+        version: 1,
+        status: "Atendido",
+      },
+      {
+        id: "poderes",
+        label: "Evidência de poderes de representação",
+        file: "procuracao_v1.pdf",
+        version: 1,
+        status: "Atendido",
+      },
     ],
     findings: [],
     rulesExecuted: ["R-DOC-01", "R-DOC-04", "R-KYC-02", "R-POL-01"],
     recommendation:
       "Encaminhar para validação em sombra (N1). O agente não encaminha diretamente ao N2 no MVP.",
-    authorizedAction: "Handoff controlado para validação em sombra — obrigatória antes de qualquer submissão.",
+    authorizedAction:
+      "Handoff controlado para validação em sombra — obrigatória antes de qualquer submissão.",
     grounding: "Cada checagem obrigatória possui evidência associada à política vigente.",
     groundingStatus: "ok",
     evidences: [
@@ -382,7 +537,8 @@ export const SCENARIOS: Scenario[] = [
         policyCode: "POL-DOC-PJ-02",
         policyVersion: "3.1",
         policyValidity: "01/07/2026 a 31/12/2026",
-        excerpt: "Comprovante de endereço deve ter emissão inferior a 90 dias na data da submissão.",
+        excerpt:
+          "Comprovante de endereço deve ter emissão inferior a 90 dias na data da submissão.",
         timestamp: "08:47",
       },
       {
@@ -392,7 +548,8 @@ export const SCENARIOS: Scenario[] = [
         policyCode: "POL-DOC-PJ-02",
         policyVersion: "3.1",
         policyValidity: "01/07/2026 a 31/12/2026",
-        excerpt: "Contrato social consolidado é obrigatório e deve refletir a composição societária vigente.",
+        excerpt:
+          "Contrato social consolidado é obrigatório e deve refletir a composição societária vigente.",
         timestamp: "08:47",
       },
     ],
@@ -404,7 +561,14 @@ export const SCENARIOS: Scenario[] = [
     audit: [
       { id: "d1", time: "08:45", actor: "Agente", action: "Caso instanciado", to: "EM_PREPARACAO" },
       { id: "d2", time: "08:46", actor: "Regra", action: "Checklist documental", rule: "R-DOC-01" },
-      { id: "d3", time: "08:47", actor: "Regra", action: "Prontidão confirmada", from: "EM_PREPARACAO", to: "PRONTA_PARA_SUBMISSAO" },
+      {
+        id: "d3",
+        time: "08:47",
+        actor: "Regra",
+        action: "Prontidão confirmada",
+        from: "EM_PREPARACAO",
+        to: "PRONTA_PARA_SUBMISSAO",
+      },
     ],
   },
 ];

@@ -46,7 +46,11 @@ export function DocStatusBadge({ status }: { status: DocStatus }) {
   return <span className={base(docStyles[status])}>{status}</span>;
 }
 
-export function PolicyBadge({ badge }: { badge: "Fonte utilizável" | "Conflito" | "Revisão necessária" }) {
+export function PolicyBadge({
+  badge,
+}: {
+  badge: "Fonte utilizável" | "Conflito" | "Revisão necessária";
+}) {
   const map = {
     "Fonte utilizável": "bg-success/12 text-success border-success/25",
     Conflito: "bg-destructive/10 text-destructive border-destructive/30",
