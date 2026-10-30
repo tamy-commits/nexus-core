@@ -8,13 +8,13 @@ The public deployment exists only to demonstrate a controlled synthetic vertical
 
 ## Supported security scope
 
-Security fixes are accepted for the current `main` branch. The prototype does not publish versioned production releases or long-term support commitments.
+Security fixes are accepted for the current `main` branch. The tagged releases are case-study snapshots, not production releases, and carry no long-term support commitment.
 
 ## Reporting a vulnerability
 
 Do not create a public issue containing exploit details, credentials, personal data, or sensitive logs.
 
-Report a suspected vulnerability privately to the repository owner through the contact channel associated with the recruitment delivery. Include:
+Report a suspected vulnerability privately through GitHub: open the repository's **Security** tab and select **Report a vulnerability**. Reports are visible only to the repository owner. Include:
 
 - affected component;
 - reproduction steps using synthetic data;
@@ -38,7 +38,7 @@ Prohibited data includes:
 - production logs;
 - real policy documents that are not approved for publication.
 
-The repository must not contain source spreadsheets, candidate instructions, confidential attachments, or recruiter communications.
+The repository must not contain source spreadsheets, confidential attachments, private correspondence, or non-public materials from hiring processes or challenges.
 
 ## Secrets
 

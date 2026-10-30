@@ -2,6 +2,8 @@
 
 Opening a business bank account often stalls on missing, unreadable, or expired documents — and no one can explain why a case was blocked. **NEXUS checks document readiness against a versioned policy, explains every decision with evidence, and routes uncertain cases to a human before anything reaches the bank.**
 
+> 🇧🇷 **Resumo em português:** o NEXUS verifica se a documentação de uma empresa está pronta para a abertura de conta, aplicando uma política versionada com regras determinísticas, evidências auditáveis e revisão humana nos casos que exigem supervisão. É um estudo de caso técnico, usa somente dados sintéticos e não é um serviço bancário de produção.
+
 Built as a technical case study, it demonstrates a working vertical slice from the user interface to the API and a controlled banking-integration mock. It is not a production banking service and must not process real customer data.
 
 ## Try it in 60 seconds
