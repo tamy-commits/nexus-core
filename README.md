@@ -1,14 +1,40 @@
 # NEXUS
 
-NEXUS is a controlled document-readiness MVP for business-account onboarding. It receives structured metadata from a simulated document-capture layer, retrieves the applicable policy, evaluates deterministic document rules, and returns an auditable recommendation with evidence, a unique Run ID, state transitions, and Human-in-the-Loop controls.
+Opening a business bank account often stalls on missing, unreadable, or expired documents — and no one can explain why a case was blocked. **NEXUS checks document readiness against a versioned policy, explains every decision with evidence, and routes uncertain cases to a human before anything reaches the bank.**
 
-The prototype demonstrates a functional vertical slice from the user interface to the API and a controlled banking-integration mock. It is designed for interview and engineering-evidence purposes; it is not a production banking service and must not process real customer data.
+Built as a technical case study, it demonstrates a working vertical slice from the user interface to the API and a controlled banking-integration mock. It is not a production banking service and must not process real customer data.
 
-- **Frontend:** https://nexus-blueprint-core.lovable.app
-- **API:** https://nexus-executable-evidence-api.onrender.com
-- **Health check:** https://nexus-executable-evidence-api.onrender.com/health
+## Try it in 60 seconds
 
-> The Render Free instance can spin down after inactivity. The first request may take about one minute while the service wakes up.
+No installation needed. Send a case with an expired proof of address to the public API:
+
+```sh
+curl -X POST https://nexus-executable-evidence-api.onrender.com/v1/cases/analyze-demo \
+  -H "Content-Type: application/json" \
+  -d '{"case_id":"NXS-DEMO-001","segment":"Silver","request_type":"Abertura de conta empresarial","documents":[
+    {"id":"contrato","label":"Contrato social","file":"contrato.pdf","version":1,"present":true,"readable":true},
+    {"id":"repr","label":"Representantes","file":"representantes.zip","version":1,"present":true,"readable":true},
+    {"id":"endereco","label":"Comprovante de endereço","file":"endereco.pdf","version":1,"issued_at":"2026-01-10","present":true,"readable":true},
+    {"id":"form","label":"Formulário","file":"formulario.pdf","version":1,"present":true,"readable":true},
+    {"id":"poderes","label":"Poderes de representação","file":"poderes.pdf","version":1,"present":true,"readable":true}]}'
+```
+
+NEXUS blocks the case and tells you exactly why (response trimmed):
+
+```json
+{
+  "decision": "CORRECAO_NECESSARIA",
+  "reason_code": "DOC_VENCIDO",
+  "recommendation": "Comprovante de endereço emitido há 90 dias ou mais.",
+  "rules_executed": ["RET-POLICY-v1", "R-DOC-01", "R-DOC-04"],
+  "evidence": [{ "policy_code": "POL-DOC-PJ-02", "policy_version": "3.1" }]
+}
+```
+
+Every response also carries a unique Run ID, state transitions, and a full audit trail.
+Prefer a browser? Use the [interactive API docs](https://nexus-executable-evidence-api.onrender.com/docs) or the [frontend demo](https://nexus-blueprint-core.lovable.app).
+
+> The API runs on Render's free tier and may take about one minute to wake up on the first request.
 
 ## What the MVP proves
 
