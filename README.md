@@ -4,6 +4,8 @@ Opening a business bank account often stalls on missing, unreadable, or expired 
 
 Built as a technical case study, it demonstrates a working vertical slice from the user interface to the API and a controlled banking-integration mock. It is not a production banking service and must not process real customer data.
 
+![NEXUS case workspace: the proof of address is expired, so the case is held for correction with the rule, finding, and policy evidence shown](docs/images/case-workspace-blocked.png)
+
 ## Try it in 60 seconds
 
 No installation needed. Send a case with an expired proof of address to the public API:
@@ -35,6 +37,18 @@ Every response also carries a unique Run ID, state transitions, and a full audit
 Prefer a browser? Use the [interactive API docs](https://nexus-executable-evidence-api.onrender.com/docs) or the [frontend demo](https://nexus-blueprint-core.lovable.app).
 
 > The API runs on Render's free tier and may take about one minute to wake up on the first request.
+
+## Demo walkthrough
+
+The main scenario in the interface follows one case from blocked to ready: the expired proof of address holds the case, a new document version is submitted, the API re-evaluates it, and the case moves to shadow validation — never to automatic submission.
+
+![Demo flow: open the main scenario, submit a new document version, and inspect the audit trail](docs/images/demo-flow.gif)
+
+Every step is recorded in the audit timeline, including the Run ID and the execution configuration:
+
+![Audit timeline with Run ID, execution configuration, and recorded events](docs/images/audit-timeline.png)
+
+*Captured from a local run of this repository (frontend and API) with the synthetic scenario `NXS-2026-0148`. Step-by-step instructions are in the [demo runbook](docs/demo-runbook.md).*
 
 ## What the MVP proves
 
